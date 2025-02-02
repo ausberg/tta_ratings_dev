@@ -1,393 +1,120 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <title>ruby_ratings</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; background-color: #D2B48C; color: black; }
-        .container { max-width: 90%; margin: 0 auto; padding: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        table { width: auto; margin: 0 auto; border-collapse: collapse; white-space: nowrap; }
-        th, td { padding: 6px 8px; font-size: 14px; border: 1px solid #A67B5B; text-align: center; }
-        th { padding: 8px; font-size: 14px; background-color: #A67B5B; color: black; cursor: pointer; }
-        th:hover { background-color: #8B5A2B; }
-        tr:nth-child(even) { background-color: #F0E4D7; }
-        tr:nth-child(odd) { background-color: #E6D2BA; }
-        .positive { color: green; font-weight: bold; }
-        .negative { color: red; font-weight: bold; }
-        .pagination { margin-top: 10px; text-align: center; }
-        .pagination button { padding: 5px 10px; margin: 5px; border: none; background-color: #A67B5B; color: black; cursor: pointer; }
-        .pagination button:hover { background-color: #8B5A2B; }
-        .pagination button:disabled { background-color: #ccc; cursor: not-allowed; }
-        .export-btn { margin-top: 10px; padding: 6px 12px; font-size: 14px; background-color: #28a745; color: white; border: none; cursor: pointer; }
-        .export-btn:hover { background-color: #218838; }
-        .filter-btn { font-size: 14px; margin-left: 2px; background: none; border: none; cursor: pointer; }
-        .filter-menu { position: absolute; display: none; background: white; border: 1px solid #A67B5B; box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2); padding: 10px; z-index: 1000; }
-        .filter-menu input { width: 100%; padding: 5px; margin-bottom: 5px; border: 1px solid #A67B5B; }
-    </style>
-    <script>
-        let currentPage = 1;
-        const rowsPerPage = 25;
-        let allRows = [];
-        const highlightColumns = [1, 4, 6, 8, 18];
-        let sortDirection = {};
-        let filteredRows = [];
-
-        async function loadCSV(filename = "ratings.csv") {
-            // Construct the URL for fetching the CSV file
-            const csvURL = `https://raw.githubusercontent.com/ausberg/tta_ratings/main/${filename}`;
-            
-            try {
-                console.log(`Fetching: ${csvURL}`); 
-                
-                // Fetch the CSV data from GitHub
-                const response = await fetch(csvURL);
-                
-                // Handle errors if the file doesn't load properly
-                if (!response.ok) {
-                    throw new Error(`Failed to load ${filename}, status: ${response.status}`);
-                }
-
-                // Read the response as text
-                const data = await response.text();
-                console.log("CSV Data Loaded:", data.substring(0, 500)); // Log preview of data
-
-                // Split CSV into rows, ignoring the header row
-                const rows = data.trim().split("\n").slice(1);
-                
-                // Convert each row into an array of values, ignoring empty rows
-                allRows = rows.map(row => row.split(/,|;/).slice(0, 19)).filter(columns => columns.length === 19);
-                console.log("Parsed Rows:", allRows.length, "rows loaded");
-
-                // Display the first page of data
-                displayPage(1);
-                
-                // Enable sorting and filtering functionality
-                addSorting();
-                setupFilterButtons();
-
-                // Reset the search input field
-                document.getElementById("search").value = "";
-
-                // Update the page title based on the selected dataset
-                const titleMap = {
-                    "ratings.csv": "Overall Ratings",
-                    "2p_ratings.csv": "2-Player Ratings",
-                    "3p_ratings.csv": "3-Player Ratings",
-                    "4p_ratings.csv": "4-Player Ratings"
-                };
-                document.getElementById("ratings-title").textContent = `ruby_buby's Mid-Season Ratings (${titleMap[filename].replace(" Ratings", "")})`;
-
-                // Update the export button to download the currently selected file
-                document.getElementById("export-btn").setAttribute("onclick", `exportCSV('${filename}')`);
-            
-            } catch (error) {
-                console.error("Error loading CSV:", error);
-            }
-        }
-
-        function addSorting() {
-            // Select all table header elements and add a click event listener to each
-            document.querySelectorAll("th").forEach((th, index) => {
-            th.addEventListener("click", function (event) {
-                // Ignore clicks on filter buttons
-                if (event.target.classList.contains("filter-btn")) return;
-
-                // Toggle sort direction for the clicked column
-                sortDirection[index] = sortDirection[index] ? -sortDirection[index] : 1;
-
-                // Determine the data to sort (filtered rows if any, otherwise all rows)
-                let dataToSort = filteredRows.length > 0 ? filteredRows : allRows;
-
-                // Sort the data based on the clicked column and sort direction
-                dataToSort.sort((a, b) => sortDirection[index] * a[index].localeCompare(b[index], undefined, { numeric: true }));
-
-                // Display the first page of the sorted data
-                displayPage(1);
-                });
-            });
-        }
-
-        function setupFilterButtons() {
-            // Add a click event listener to the document
-            document.addEventListener("click", function(event) {
-
-            // Check if the clicked element is a filter button
-            if (event.target.classList.contains("filter-btn")) {
-
-                // Prevent the event from propagating further
-                event.stopPropagation();
-
-                // Get the index of the column to filter
-                const index = parseInt(event.target.getAttribute("data-index"));
-
-                // Show the filter menu for the selected column
-                showFilterMenu(index, event.target);
-                }
-            });
-        }
-
-        function handleFilterClick(event) {
-            // Get the column index from the filter button
-            const index = parseInt(event.target.getAttribute("data-index"));
-
-            // Open the filter menu for this column
-            showFilterMenu(index, event.target);
-        }
-
-        function showFilterMenu(index, button) {
-            // Set the active column for filtering
-            activeFilterColumn = index;
-
-            // Get filter menu elements
-            const filterMenu = document.getElementById("filter-menu");
-            const filterTitle = document.getElementById("filter-title");
-
-            // Update the filter menu title to show the column being filtered
-            filterTitle.textContent = `Filter: ${document.querySelectorAll("th")[index].textContent.trim()}`;
-
-            // Position the filter menu below the clicked button
-            const rect = button.getBoundingClientRect();
-            filterMenu.style.display = "block";
-            filterMenu.style.left = `${rect.left + window.scrollX}px`;
-            filterMenu.style.top = `${rect.bottom + window.scrollY + 5}px`; // Offset slightly below
-        }
-
-        // Hides the filter menu when a filter is applied or dismissed
-        function hideFilterMenu() {
-            document.getElementById("filter-menu").style.display = "none";
-        }
-
-        // Applies a column filter based on user input
-        function applyColumnFilter() {
-            const input = document.getElementById("filter-input").value.trim();
-            
-            // If no column is active or input is empty, exit function
-            if (!activeFilterColumn || input === "") return;
-
-            let condition = input;
-            let operator = "="; // Default: exact match
-
-            // Allow ">" or "<" for greater/less than filtering
-            if (input.startsWith(">") || input.startsWith("<")) {
-                operator = input.charAt(0);
-                condition = input.substring(1).trim();
-            }
-
-            // Filter rows based on the selected column and condition
-            filteredRows = allRows.filter(row => {
-                let value = row[activeFilterColumn];
-
-                // Convert values to numbers if applicable
-                if (!isNaN(value)) value = parseFloat(value);
-                if (!isNaN(condition)) condition = parseFloat(condition);
-
-                // Apply comparison logic
-                if (operator === "=") return value == condition;
-                if (operator === ">") return value > condition;
-                if (operator === "<") return value < condition;
-                return false;
-            });
-
-            displayPage(1); // Refresh table with filtered data
-            hideFilterMenu(); // Close the filter menu
-        }
-
-        // Updates the table display with filtered results
-        function displayFilteredResults(filteredRows) {
-            let tableBody = filteredRows.map(columns => `
-                <tr>
-                    ${columns.map((col, index) => formatColumn(col, index)).join('')}
-                </tr>
-            `).join('');
-
-            // Insert the filtered rows into the table body
-            document.getElementById("ratings-table-body").innerHTML = tableBody;
-        }
-
-        // Clears the applied column filter and resets the table to show all data
-        function clearColumnFilter() {
-            filteredRows = [];  // Reset the filtered dataset
-            displayPage(1);      // Reload the full table
-            hideFilterMenu();    // Close the filter menu
-        }
-
-        // Displays a specific page of data in the table
-        function displayPage(page) {
-            currentPage = page;
-            
-            // Determine the range of rows to display for the current page
-            const start = (page - 1) * rowsPerPage;
-            const end = start + rowsPerPage;
-
-            // Use filtered data if available, otherwise use the full dataset
-            let dataToDisplay = filteredRows.length > 0 ? filteredRows : allRows;
-            const pageRows = dataToDisplay.slice(start, end);
-
-            // Generate the table rows from the selected data
-            let tableBody = pageRows.map(columns => `
-                <tr>
-                    ${columns.map((col, index) => formatColumn(col, index)).join('')}
-                </tr>
-            `).join('');
-
-            // Update the table with the new rows
-            document.getElementById("ratings-table-body").innerHTML = tableBody;
-
-            // Update pagination controls based on the new page
-            updatePagination(page);
-        }
-
-        // Formats a table column, adding color styling for highlight columns
-        function formatColumn(value, index) {
-            if (highlightColumns.includes(index)) {
-                let num = parseFloat(value);
-                
-                if (!isNaN(num)) {
-                    let formattedValue = (num > 0 ? `+${num}` : num); // Add "+" for positive values
-                    let className = num > 0 ? "positive" : num < 0 ? "negative" : "";
-                    return `<td class="${className}">${formattedValue}</td>`;
-                }
-            }
-            // Return the value as a standard table cell
-            return `<td>${value}</td>`;
-        }
-
-        // Updates the pagination controls based on the current page
-        function updatePagination(page) {
-            const totalPages = Math.ceil(allRows.length / rowsPerPage); // Calculate total pages
-
-            // Create "Previous" button and disable it if on the first page
-            let paginationHtml = `<button onclick="displayPage(${page - 1})" ${page === 1 ? 'disabled' : ''}>Previous</button>`;
-            
-            // Determine the range of page numbers to display (centered around the current page)
-            let startPage = Math.max(1, page - 3);
-            let endPage = Math.min(totalPages, page + 3);
-            
-            // Generate numbered page buttons
-            for (let i = startPage; i <= endPage; i++) {
-                paginationHtml += `<button onclick="displayPage(${i})" ${i === page ? 'style="font-weight: bold;"' : ''}>${i}</button>`;
-            }
-
-            // Create "Next" button and disable it if on the last page
-            paginationHtml += `<button onclick="displayPage(${page + 1})" ${page === totalPages ? 'disabled' : ''}>Next</button>`;
-
-            // Update the pagination controls in the DOM
-            document.querySelector(".pagination").innerHTML = paginationHtml;
-        }
-
-        // Exports the selected CSV file for download
-        function exportCSV(filename) {
-            let csvURL = `https://raw.githubusercontent.com/ausberg/tta_ratings/main/${filename}`;
-
-            // Fetch the CSV file from the given URL
-            fetch(csvURL)
-                .then(response => response.blob()) // Convert response to a Blob object
-                .then(blob => {
-                    // Create a temporary link element to trigger the file download
-                    let link = document.createElement("a");
-                    link.href = window.URL.createObjectURL(blob);
-                    link.download = filename; // Set the filename for download
-                    document.body.appendChild(link);
-                    link.click(); // Simulate a click to start download
-                    document.body.removeChild(link); // Remove the link after download
-                })
-                .catch(error => console.error("Error downloading CSV:", error)); // Handle errors
-        }
-
-        // Searches the table for rows that match the input query
-        function searchTable() {
-            const query = document.getElementById("search").value.toLowerCase();
-
-            // If the search box is empty, reset the table to its default state
-            if (!query) {
-                displayPage(1);
-                return;
-            }
-
-            // Filter rows where at least one column contains the search query
-            const filteredRows = allRows.filter(row =>
-                row.some(cell => cell && cell.toLowerCase().includes(query))
-            );
-
-            // Display the filtered search results
-            displaySearch(filteredRows);
-        }
-
-        // Updates the table display with search results
-        function displaySearch(filteredRows) {
-            let tableBody = filteredRows.map(columns => `
-                <tr>
-                    ${columns.map((col, index) => formatColumn(col, index)).join('')}
-                </tr>
-            `).join('');
-
-            // Insert the filtered rows into the table body
-            document.getElementById("ratings-table-body").innerHTML = tableBody;
-        }
-
-        // Loads the CSV data when the page first loads
-        window.onload = async function() { 
-            await loadCSV();
-        };
-    </script>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <link rel="icon" type="image/png" href="favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
+
     <div class="container">
         <h2 id="ratings-title" style="text-align: center;">ruby_buby's Mid-Season Ratings</h2>
-        <p style="text-align: center;"><strong>Rating changes since pajada's last publication on 12/15/24.</strong></p>
-        <p style="text-align: center;"><strong>Tournaments included:</strong><br>Mercurial Ladder Seasons 19 & 20, Sodium Ladder Season 2, Royal League Season 2 Tiebreakers,<br>World Championship 2025 Stages 1 & 2, International Championship Season 19</p>
-        <p style="text-align: center;"><strong>Rank "-" indicates inactive players, Δ columns are the change from the last published ratings.</strong></p>
-    
-        <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 10px;">
-            <button class="export-btn" onclick="loadCSV('ratings.csv')">Overall Ratings</button>
-            <button class="export-btn" onclick="loadCSV('2p_ratings.csv')">2-Player Ratings</button>
-            <button class="export-btn" onclick="loadCSV('3p_ratings.csv')">3-Player Ratings</button>
-            <button class="export-btn" onclick="loadCSV('4p_ratings.csv')">4-Player Ratings</button>
-        </div>
-    
-        <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 10px;">
-            <button id="export-btn" class="export-btn" onclick="exportCSV('ratings.csv')">Export Current</button>
-            <button class="export-btn" onclick="exportAllCSV()">Export All</button>
-        </div>
-    
-        <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 10px;">
-            <input type="text" id="search" placeholder="Search players..." onkeyup="searchTable()" style="width: 250px;">
-        </div>
+        <p style="text-align: center;">
+            <strong>Rating changes since
+                <a href="https://docs.google.com/spreadsheets/d/10mrIwZNchMz7FMYgddUnniqm82VCYFJJPZJqEDP75F0" target="_blank">pajada's latest publication</a>
+                on 12/15/24.
+            </strong>
+        </p>
+        <p style="text-align: center;">Rating baselines and changes use ruby_buby's Glicko framework.<br>
+            
+        <br>
 
-        <div style="overflow-x: auto;">
+        <p style="text-align: center;"><strong>Additional Tournaments included:</strong><br>
+            Mercurial Ladder Seasons 19 & 20, Sodium Ladder Season 2, Royal League Season 2 Tiebreakers,<br>
+            World Championship 2025 Stages 1 & 2, International Championship Season 19
+        </p>
+
+        <br>
+
+        <div class="controls-container">
+            <div class="controls-section" style="justify-content: flex-start;">
+                <button class="export-btn" onclick="loadCSV('ratings_overall.csv')">Overall Ratings</button>
+                <button class="export-btn" onclick="loadCSV('ratings_2p.csv')">2-Player Ratings</button>
+                <button class="export-btn" onclick="loadCSV('ratings_3p.csv')">3-Player Ratings</button>
+                <button class="export-btn" onclick="loadCSV('ratings_4p.csv')">4-Player Ratings</button>
+            </div>
+        
+            <div class="controls-section search-container">
+                <input type="text" id="search" placeholder="Search players..." onkeyup="searchTable()" style="width: 250px; text-align: center;">
+            </div>
+        
+            <div class="controls-section" style="justify-content: flex-end;">
+                <button id="export-btn" class="export-btn" onclick="exportCSV('ratings_overall.csv')">Export Current</button>
+                <button class="export-btn" onclick="exportAllCSV()">Export All</button>
+            </div>
+        </div>                      
+
+        <div class="table-container">
             <table>
                 <tr>
-                    <th>Rank <button class="filter-btn" data-index="0">≡</button></th>
-                    <th>Rank Δ <button class="filter-btn" data-index="1">≡</button></th>
-                    <th>Player <button class="filter-btn" data-index="2">≡</button></th>
-                    <th>Cons. Rating <button class="filter-btn" data-index="3">≡</button></th>
-                    <th>Cons. Δ <button class="filter-btn" data-index="4">≡</button></th>
-                    <th>Rating <button class="filter-btn" data-index="5">≡</button></th>
-                    <th>Rating Δ <button class="filter-btn" data-index="6">≡</button></th>
-                    <th>RD <button class="filter-btn" data-index="7">≡</button></th>
-                    <th>RD Δ <button class="filter-btn" data-index="8">≡</button></th>
-                    <th>Opps <button class="filter-btn" data-index="9">≡</button></th>
-                    <th>Ws <button class="filter-btn" data-index="10">≡</button></th>
-                    <th>Ls <button class="filter-btn" data-index="11">≡</button></th>
-                    <th>Ds <button class="filter-btn" data-index="12">≡</button></th>
-                    <th>W% <button class="filter-btn" data-index="13">≡</button></th>
-                    <th>Opps Δ <button class="filter-btn" data-index="14">≡</button></th>
-                    <th>Ws Δ <button class="filter-btn" data-index="15">≡</button></th>
-                    <th>Ls Δ <button class="filter-btn" data-index="16">≡</button></th>
-                    <th>Ds Δ <button class="filter-btn" data-index="17">≡</button></th>
-                    <th>W% Δ <button class="filter-btn" data-index="18">≡</button></th>
+                    <th title="The player's position in the leaderboard based on Conservative Rating.&#10;- Denotes inactive players">Rank <button class="filter-btn" data-index="0">≡</button></th>                    
+                    <th title="Change in rank since pajada's last publication.">Rank Δ <button class="filter-btn" data-index="1">≡</button></th>
+                    <th title="The player's name.">Player <button class="filter-btn" data-index="2">≡</button></th>
+                    <th title="Conservative Rating = Rating - (3 * RD), ensuring more stability.">Cons. Rating <button class="filter-btn" data-index="3">≡</button></th>
+                    <th title="Change in Conservative Rating since pajada's last publication.">Cons. Δ <button class="filter-btn" data-index="4">≡</button></th>
+                    <th title="The player's estimated skill level based on recent results.">Rating <button class="filter-btn" data-index="5">≡</button></th>
+                    <th title="Change in rating since pajada's last publication.">Rating Δ <button class="filter-btn" data-index="6">≡</button></th>
+                    <th title="Rating Deviation (RD) represents rating uncertainty. Lower is better.">RD <button class="filter-btn" data-index="7">≡</button></th>
+                    <th title="Change in Rating Deviation (RD) since pajada's last publication.">RD Δ <button class="filter-btn" data-index="8">≡</button></th>
+                    <th title="Total number of unique opponents faced.">Opps <button class="filter-btn" data-index="9">≡</button></th>
+                    <th title="Total number of games won.">Ws <button class="filter-btn" data-index="10">≡</button></th>
+                    <th title="Total number of games lost.">Ls <button class="filter-btn" data-index="11">≡</button></th>
+                    <th title="Total number of games drawn.">Ds <button class="filter-btn" data-index="12">≡</button></th>
+                    <th title="Win percentage = (Wins / (Wins + Losses + Draws)) * 100.">W% <button class="filter-btn" data-index="13">≡</button></th>
+                    <th title="Change in the number of unique opponents since pajada's last publication.">Opps Δ <button class="filter-btn" data-index="14">≡</button></th>
+                    <th title="Change in the number of wins since pajada's last publication.">Ws Δ <button class="filter-btn" data-index="15">≡</button></th>
+                    <th title="Change in the number of losses since pajada's last publication.">Ls Δ <button class="filter-btn" data-index="16">≡</button></th>
+                    <th title="Change in the number of draws since pajada's last publication.">Ds Δ <button class="filter-btn" data-index="17">≡</button></th>
+                    <th title="Change in win percentage since pajada's last publication.">W% Δ <button class="filter-btn" data-index="18">≡</button></th>
                 </tr>
                 <tbody id="ratings-table-body"></tbody>
-            </table>       
+            </table>
+        </div>
+                </tr>
+                <tbody id="ratings-table-body"></tbody>
+            </table>
         </div>
 
-        <div id="filter-menu" class="filter-menu">
-            <h4 id="filter-title"></h4>
+        <p style="text-align: center;">
+            Need help understanding the columns? 
+            <a href="https://github.com/ausberg/tta_ratings/blob/main/definitions.md" target="_blank">View definitions here.</a>
+        </p>
+
+        <div id="filter-menu" style="display: none; position: absolute; background: white; border: 1px solid gray; padding: 10px;">
+            <div id="filter-title" style="font-weight: bold;"></div>
             <input type="text" id="filter-input" placeholder="Enter filter value">
             <button onclick="applyColumnFilter()">Apply</button>
             <button onclick="clearColumnFilter()">Clear</button>
-        </div>        
+            <div id="filter-tooltip" style="font-size: 12px; color: gray; margin-top: 5px;">
+                Use '=', '>', '>=', '<', '<=' for filtering (e.g., '>= 10' or '<= 5').
+            </div>
+        </div>
 
-        <div class="pagination"></div>
-    </div>    
+        <div class="pagination">
+            <button onclick="displayPage(currentPage - 1)" id="prevPageBtn">Previous</button>
+            <button onclick="displayPage(currentPage - 3)" ${currentPage - 3 < 1 ? 'disabled' : ''}>&laquo; -3</button>
+            <button onclick="displayPage(currentPage - 2)" ${currentPage - 2 < 1 ? 'disabled' : ''}>&laquo; -2</button>
+            <button onclick="displayPage(currentPage - 1)" ${currentPage - 1 < 1 ? 'disabled' : ''}>&laquo; -1</button>
+        
+            <input type="number" id="pageJumpInput" placeholder="Page" min="1" style="width: 50px; text-align: center;">
+            <button onclick="jumpToPage()">Go</button>
+        
+            <button onclick="displayPage(currentPage + 1)" ${currentPage + 1 > totalPages ? 'disabled' : ''}>&raquo; +1</button>
+            <button onclick="displayPage(currentPage + 2)" ${currentPage + 2 > totalPages ? 'disabled' : ''}>&raquo; +2</button>
+            <button onclick="displayPage(currentPage + 3)" ${currentPage + 3 > totalPages ? 'disabled' : ''}>&raquo; +3</button>
+        
+            <button onclick="displayPage(currentPage + 1)" id="nextPageBtn">Next</button>
+        </div>
+
+    </div>
+
+    <footer style="text-align: center; padding: 10px; font-size: 14px;">
+        © 2025 ruby_ratings | <a href="https://github.com/ausberg/tta_ratings" target="_blank">View on GitHub</a> | 
+        <a href="https://github.com/ausberg/tta_ratings/issues" target="_blank">Report an Issue</a> |
+        <span id="last-updated">Last updated: Fetching...</span>
+    </footer>   
+
+    <script src="script.js"></script>
 </body>
 </html>

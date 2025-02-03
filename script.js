@@ -1,9 +1,31 @@
 let currentPage = 1;
-const rowsPerPage = 22;
 let allRows = [];
 const highlightColumns = [1, 4, 6, 8, 18];
 let sortDirection = {};
 let filteredRows = [];
+
+function calculateRowsPerPage() {
+    const tableContainer = document.querySelector(".table-container");
+    if (!tableContainer) return 20; // Fallback in case element is missing
+
+    const windowHeight = window.innerHeight; // Total screen height
+    const headerHeight = document.querySelector("h2").offsetHeight + 100; // Approximate header + controls
+    const rowHeight = 30; // Approximate row height in pixels
+    const availableHeight = windowHeight - headerHeight;
+
+    return Math.max(10, Math.floor(availableHeight / rowHeight)); // Ensure at least 10 rows
+}
+
+let rowsPerPage = calculateRowsPerPage(); // Set initial value
+
+window.onload = async function() {
+    rowsPerPage = calculateRowsPerPage(); // Recalculate rows on load
+    await loadCSV();
+    window.addEventListener("resize", () => {
+        rowsPerPage = calculateRowsPerPage();
+        displayPage(currentPage);
+    });
+};
 
 async function loadCSV(filename = "ratings_overall.csv") {
     // Construct the URL for fetching the CSV file
@@ -216,6 +238,7 @@ function clearColumnFilter() {
 
 // Displays a specific page of data in the table
 function displayPage(page) {
+    rowsPerPage = calculateRowsPerPage(); // Recalculate on each render
     currentPage = page;
 
     const start = (page - 1) * rowsPerPage;
@@ -225,7 +248,7 @@ function displayPage(page) {
     const pageRows = dataToDisplay.slice(start, end);
 
     let tableBody = pageRows.map((columns, rowIndex) => {
-        let globalRowIndex = start + rowIndex; // Calculate original index in allRows
+        let globalRowIndex = start + rowIndex;
         let highlightClass = (globalRowIndex === window.highlightRowIndex) ? "highlight" : "";
 
         return `<tr class="${highlightClass}">

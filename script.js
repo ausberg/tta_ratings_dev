@@ -333,7 +333,8 @@ function updatePagination(page) {
         if (nextButton) {
             nextButton.insertAdjacentElement("afterend", existingDropdown);
         } else {
-            console.warn("Next button not found! Inserting dropdown at end of pagination.");
+            // by default this currently seems to never find the button and
+            // adds the dropdown to the end of the pagination
             document.querySelector(".pagination").appendChild(existingDropdown);
         }
     }

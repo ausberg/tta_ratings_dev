@@ -19,8 +19,15 @@ function calculateRowsPerPage() {
 let rowsPerPage = calculateRowsPerPage(); // Set initial value
 
 window.onload = async function() {
-    rowsPerPage = calculateRowsPerPage(); // Recalculate rows on load
+    rowsPerPage = calculateRowsPerPage();
     await loadCSV();
+
+    // Listen for dropdown changes
+    document.getElementById("rowsPerPageSelect").addEventListener("change", () => {
+        rowsPerPage = calculateRowsPerPage();
+        displayPage(1); // Reset to first page when changing rows per page
+    });
+
     window.addEventListener("resize", () => {
         rowsPerPage = calculateRowsPerPage();
         displayPage(currentPage);

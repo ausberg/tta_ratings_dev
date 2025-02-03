@@ -164,6 +164,19 @@ tr:nth-child(odd) {
     cursor: not-allowed;
 }
 
+.rows-per-page-container {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-left: 15px; /* Creates spacing between pagination and dropdown */
+}
+
+#rowsPerPageSelect {
+    padding: 5px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
 .export-btn {
     margin-top: 5px;
     padding: 5px 10px;

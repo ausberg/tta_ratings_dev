@@ -93,6 +93,7 @@
 
         <div class="pagination">
             <button onclick="displayPage(currentPage - 1)" id="prevPageBtn">Previous</button>
+        
             <button onclick="displayPage(currentPage - 3)" ${currentPage - 3 < 1 ? 'disabled' : ''}>&laquo; -3</button>
             <button onclick="displayPage(currentPage - 2)" ${currentPage - 2 < 1 ? 'disabled' : ''}>&laquo; -2</button>
             <button onclick="displayPage(currentPage - 1)" ${currentPage - 1 < 1 ? 'disabled' : ''}>&laquo; -1</button>
@@ -105,7 +106,18 @@
             <button onclick="displayPage(currentPage + 3)" ${currentPage + 3 > totalPages ? 'disabled' : ''}>&raquo; +3</button>
         
             <button onclick="displayPage(currentPage + 1)" id="nextPageBtn">Next</button>
-        </div>
+        
+            <div class="rows-per-page-container">
+                <label for="rowsPerPageSelect">Rows per page:</label>
+                <select id="rowsPerPageSelect">
+                    <option value="auto">Auto</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="75">75</option>
+                    <option value="100">100</option>
+                </select>
+            </div>
+        </div>        
 
     </div>
 

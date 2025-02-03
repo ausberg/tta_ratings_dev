@@ -3,6 +3,7 @@ let allRows = [];
 const highlightColumns = [1, 4, 6, 8, 18];
 let sortDirection = {};
 let filteredRows = [];
+let rowsPerPage = calculateRowsPerPage();
 
 function calculateRowsPerPage() {
     const tableContainer = document.querySelector(".table-container");
@@ -15,24 +16,6 @@ function calculateRowsPerPage() {
 
     return Math.max(10, Math.floor(availableHeight / rowHeight)); // Ensure at least 10 rows
 }
-
-let rowsPerPage = calculateRowsPerPage(); // Set initial value
-
-window.onload = async function() {
-    rowsPerPage = calculateRowsPerPage();
-    await loadCSV();
-
-    // Listen for dropdown changes
-    document.getElementById("rowsPerPageSelect").addEventListener("change", () => {
-        rowsPerPage = calculateRowsPerPage();
-        displayPage(1); // Reset to first page when changing rows per page
-    });
-
-    window.addEventListener("resize", () => {
-        rowsPerPage = calculateRowsPerPage();
-        displayPage(currentPage);
-    });
-};
 
 async function loadCSV(filename = "ratings_overall.csv") {
     // Construct the URL for fetching the CSV file
@@ -245,8 +228,6 @@ function clearColumnFilter() {
 
 // Displays a specific page of data in the table
 function displayPage(page) {
-    rowsPerPage = calculateRowsPerPage(); // Recalculate on each render
-    currentPage = page;
 
     const start = (page - 1) * rowsPerPage;
     const end = start + rowsPerPage;
@@ -264,6 +245,7 @@ function displayPage(page) {
     }).join('');
 
     document.getElementById("ratings-table-body").innerHTML = tableBody;
+
     updatePagination(page);
 }
 
@@ -341,7 +323,20 @@ function updatePagination(page) {
     paginationHtml += `<button onclick="displayPage(${page + 1})" ${page === totalPages ? 'disabled' : ''}>Next</button>`;
 
     // Update the pagination UI
-    document.querySelector(".pagination").innerHTML = paginationHtml;
+    let paginationDiv = document.querySelector(".pagination");
+    let existingDropdown = document.querySelector(".rows-per-page-container");
+    paginationDiv.innerHTML = paginationHtml;
+
+    // Re-add the dropdown if it was removed
+    if (existingDropdown && !document.getElementById("rowsPerPageSelect")) {
+        let nextButton = document.getElementById("nextPageBtn");
+        if (nextButton) {
+            nextButton.insertAdjacentElement("afterend", existingDropdown);
+        } else {
+            console.warn("Next button not found! Inserting dropdown at end of pagination.");
+            document.querySelector(".pagination").appendChild(existingDropdown);
+        }
+    }
 }
 
 // Exports the selected CSV file for download
@@ -393,7 +388,41 @@ function searchTable() {
     displayPage(pageNumber);
 }
 
-// Loads the CSV data when the page first loads
-window.onload = async function() { 
+window.onload = async function() {
+    rowsPerPage = calculateRowsPerPage();
     await loadCSV();
+
+    // Function to update rows per page dynamically
+    function updateRowsPerPage() {
+        let selectedValue = document.getElementById("rowsPerPageSelect").value;
+        rowsPerPage = selectedValue === "auto" ? calculateRowsPerPage() : parseInt(selectedValue, 10);
+        displayPage(1); // Reload table with new row count
+    }       
+
+    // Ensure the dropdown is inserted into pagination
+    if (!document.getElementById("rowsPerPageSelect")) {
+        document.getElementById("nextPageBtn")?.insertAdjacentHTML("afterend", `
+            <div class="rows-per-page-container">
+                <label for="rowsPerPageSelect">Rows per page:</label>
+                <select id="rowsPerPageSelect">
+                    <option value="auto">Auto</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="75">75</option>
+                    <option value="100">100</option>
+                </select>
+            </div>
+        `);
+    }
+
+    // Attach event listener to dropdown changes
+    document.getElementById("rowsPerPageSelect").addEventListener("change", updateRowsPerPage);
+
+    // Update on window resize
+    window.addEventListener("resize", () => {
+        rowsPerPage = calculateRowsPerPage();
+        displayPage(currentPage);
+    });
+
+    fetchLastCommitDate(); // Ensure last updated date is fetched
 };

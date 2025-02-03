@@ -141,8 +141,13 @@ tr:nth-child(odd) {
 }
 
 .pagination {
-    margin-top: 5px;
-    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Centers all pagination elements */
+    gap: 15px;
+    width: 100%; /* Ensure it takes full width */
+    flex-wrap: wrap;
+    position: relative;
 }
 
 .pagination button {
@@ -167,8 +172,8 @@ tr:nth-child(odd) {
 .rows-per-page-container {
     display: flex;
     align-items: center;
-    gap: 5px;
-    margin-left: 15px; /* Creates spacing between pagination and dropdown */
+    gap: 10px; /* More space between Next button and dropdown */
+    margin-left: 15px;
 }
 
 #rowsPerPageSelect {

@@ -274,6 +274,13 @@ function formatColumn(value, index) {
     return `<td>${value}</td>`;
 }
 
+// Function to update rows per page dynamically
+function updateRowsPerPage() {
+    let selectedValue = document.getElementById("rowsPerPageSelect").value;
+    rowsPerPage = selectedValue === "auto" ? calculateRowsPerPage() : parseInt(selectedValue, 10);
+    displayPage(1); // Reload table with new row count
+}
+
 function jumpToPage() {
     const totalPages = Math.ceil(allRows.length / rowsPerPage); // Get total pages
     let pageInput = document.getElementById("pageJumpInput").value.trim();
@@ -289,8 +296,18 @@ function jumpToPage() {
 
 // Updates the pagination controls based on the current page
 function updatePagination(page) {
-    const totalPages = Math.ceil(allRows.length / rowsPerPage); // Calculate total pages
-    let paginationHtml = `<button onclick="displayPage(${page - 1})" ${page === 1 ? 'disabled' : ''}>Previous</button>`;
+    const totalPages = Math.ceil(allRows.length / rowsPerPage);
+    let paginationDiv = document.querySelector(".pagination");
+    
+    // Clear existing pagination content
+    paginationDiv.innerHTML = "";  
+
+    // Create Previous button
+    let prevBtn = document.createElement("button");
+    prevBtn.textContent = "Previous";
+    prevBtn.disabled = page === 1;
+    prevBtn.addEventListener("click", () => displayPage(page - 1));
+    paginationDiv.appendChild(prevBtn);
 
     // Determine the range of page numbers to display
     let startPage = Math.max(1, page - 3);
@@ -298,45 +315,87 @@ function updatePagination(page) {
 
     // Show first page button if not already shown
     if (startPage > 1) {
-        paginationHtml += `<button onclick="displayPage(1)">1</button>`;
-        if (startPage > 2) paginationHtml += `<span>...</span>`; // Ellipsis for skipped pages
+        let firstPageBtn = document.createElement("button");
+        firstPageBtn.textContent = "1";
+        firstPageBtn.addEventListener("click", () => displayPage(1));
+        paginationDiv.appendChild(firstPageBtn);
+
+        if (startPage > 2) {
+            let ellipsis = document.createElement("span");
+            ellipsis.textContent = "...";
+            paginationDiv.appendChild(ellipsis);
+        }
     }
 
     // Generate page buttons dynamically
     for (let i = startPage; i <= endPage; i++) {
-        paginationHtml += `<button onclick="displayPage(${i})" ${i === page ? 'style="font-weight: bold;"' : ''}>${i}</button>`;
+        let pageBtn = document.createElement("button");
+        pageBtn.textContent = i;
+        if (i === page) {
+            pageBtn.style.fontWeight = "bold";
+        }
+        pageBtn.addEventListener("click", () => displayPage(i));
+        paginationDiv.appendChild(pageBtn);
     }
 
     // Show last page button if not already shown
     if (endPage < totalPages) {
-        if (endPage < totalPages - 1) paginationHtml += `<span>...</span>`; // Ellipsis for skipped pages
-        paginationHtml += `<button onclick="displayPage(${totalPages})">${totalPages}</button>`;
+        if (endPage < totalPages - 1) {
+            let ellipsis = document.createElement("span");
+            ellipsis.textContent = "...";
+            paginationDiv.appendChild(ellipsis);
+        }
+
+        let lastPageBtn = document.createElement("button");
+        lastPageBtn.textContent = totalPages;
+        lastPageBtn.addEventListener("click", () => displayPage(totalPages));
+        paginationDiv.appendChild(lastPageBtn);
     }
 
-    // Add the Jump-to-Page input and "Go" button
-    paginationHtml += `
-        <input type="number" id="pageJumpInput" value="${page}" min="1" max="${totalPages}" style="width: 50px; text-align: center;">
-        <button onclick="jumpToPage()">Go</button>
-    `;
+    // Add the Jump-to-Page input
+    let pageInput = document.createElement("input");
+    pageInput.type = "number";
+    pageInput.id = "pageJumpInput";
+    pageInput.value = page;
+    pageInput.min = "1";
+    pageInput.max = totalPages;
+    pageInput.style.width = "50px";
+    pageInput.style.textAlign = "center";
+    paginationDiv.appendChild(pageInput);
 
-    // Next button
-    paginationHtml += `<button onclick="displayPage(${page + 1})" ${page === totalPages ? 'disabled' : ''}>Next</button>`;
+    // Add the "Go" button
+    let goBtn = document.createElement("button");
+    goBtn.textContent = "Go";
+    goBtn.addEventListener("click", jumpToPage);
+    paginationDiv.appendChild(goBtn);
 
-    // Update the pagination UI
-    let paginationDiv = document.querySelector(".pagination");
-    let existingDropdown = document.querySelector(".rows-per-page-container");
-    paginationDiv.innerHTML = paginationHtml;
+    // Create Next button
+    let nextBtn = document.createElement("button");
+    nextBtn.id = "nextPageBtn";
+    nextBtn.textContent = "Next";
+    nextBtn.disabled = page === totalPages;
+    nextBtn.addEventListener("click", () => displayPage(page + 1));
+    paginationDiv.appendChild(nextBtn);
 
-    // Re-add the dropdown if it was removed
-    if (existingDropdown && !document.getElementById("rowsPerPageSelect")) {
-        let nextButton = document.getElementById("nextPageBtn");
-        if (nextButton) {
-            nextButton.insertAdjacentElement("afterend", existingDropdown);
-        } else {
-            // by default this currently seems to never find the button and
-            // adds the dropdown to the end of the pagination
-            document.querySelector(".pagination").appendChild(existingDropdown);
-        }
+    // Ensure rows-per-page dropdown exists and is inserted
+    if (!document.getElementById("rowsPerPageSelect")) {
+        let rowsPerPageContainer = document.createElement("div");
+        rowsPerPageContainer.classList.add("rows-per-page-container");
+        rowsPerPageContainer.innerHTML = `
+            <label for="rowsPerPageSelect">Rows per page:</label>
+            <select id="rowsPerPageSelect">
+                <option value="auto">Auto</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="75">75</option>
+                <option value="100">100</option>
+            </select>
+        `;
+
+        paginationDiv.appendChild(rowsPerPageContainer);
+
+        // Attach event listener AFTER element is created
+        document.getElementById("rowsPerPageSelect").addEventListener("change", updateRowsPerPage);
     }
 }
 
@@ -389,35 +448,10 @@ function searchTable() {
     displayPage(pageNumber);
 }
 
+// Load the table on page load
 window.onload = async function() {
     rowsPerPage = calculateRowsPerPage();
     await loadCSV();
-
-    // Function to update rows per page dynamically
-    function updateRowsPerPage() {
-        let selectedValue = document.getElementById("rowsPerPageSelect").value;
-        rowsPerPage = selectedValue === "auto" ? calculateRowsPerPage() : parseInt(selectedValue, 10);
-        displayPage(1); // Reload table with new row count
-    }       
-
-    // Ensure the dropdown is inserted into pagination
-    if (!document.getElementById("rowsPerPageSelect")) {
-        document.getElementById("nextPageBtn")?.insertAdjacentHTML("afterend", `
-            <div class="rows-per-page-container">
-                <label for="rowsPerPageSelect">Rows per page:</label>
-                <select id="rowsPerPageSelect">
-                    <option value="auto">Auto</option>
-                    <option value="25">25</option>
-                    <option value="50">50</option>
-                    <option value="75">75</option>
-                    <option value="100">100</option>
-                </select>
-            </div>
-        `);
-    }
-
-    // Attach event listener to dropdown changes
-    document.getElementById("rowsPerPageSelect").addEventListener("change", updateRowsPerPage);
 
     // Update on window resize
     window.addEventListener("resize", () => {

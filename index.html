@@ -29,19 +29,19 @@
 
         <div class="controls-container">
             <div class="controls-section" style="justify-content: flex-start;">
-                <button class="export-btn" onclick="loadCSV('ratings_overall.csv')">Overall Ratings</button>
-                <button class="export-btn" onclick="loadCSV('ratings_2p.csv')">2-Player Ratings</button>
-                <button class="export-btn" onclick="loadCSV('ratings_3p.csv')">3-Player Ratings</button>
-                <button class="export-btn" onclick="loadCSV('ratings_4p.csv')">4-Player Ratings</button>
+                <button id="overallRatingsBtn" class="export-btn">Overall Ratings</button>
+                <button id="ratings2pBtn" class="export-btn">2-Player Ratings</button>
+                <button id="ratings3pBtn" class="export-btn">3-Player Ratings</button>
+                <button id="ratings4pBtn" class="export-btn">4-Player Ratings</button>
             </div>
         
             <div class="controls-section search-container">
-                <input type="text" id="search" placeholder="Search players..." onkeyup="searchTable()" style="width: 250px; text-align: center;">
+                <input type="text" id="search" placeholder="Search players..." style="width: 250px; text-align: center;">
             </div>
         
             <div class="controls-section" style="justify-content: flex-end;">
-                <button id="export-btn" class="export-btn" onclick="exportCSV('ratings_overall.csv')">Export Current</button>
-                <button class="export-btn" onclick="exportAllCSV()">Export All</button>
+                <button id="export-btn" class="export-btn">Export Current</button>
+                <button id="exportAllBtn" class="export-btn">Export All</button>
             </div>
         </div>                      
 
@@ -84,28 +84,27 @@
         <div id="filter-menu" style="display: none; position: absolute; background: white; border: 1px solid gray; padding: 10px;">
             <div id="filter-title" style="font-weight: bold;"></div>
             <input type="text" id="filter-input" placeholder="Enter filter value">
-            <button onclick="applyColumnFilter()">Apply</button>
-            <button onclick="clearColumnFilter()">Clear</button>
+            <button id="applyFilterBtn">Apply</button>
+            <button id="clearFilterBtn">Clear</button>
             <div id="filter-tooltip" style="font-size: 12px; color: gray; margin-top: 5px;">
                 Use '=', '>', '>=', '<', '<=' for filtering (e.g., '>= 10' or '<= 5').
             </div>
         </div>
 
         <div class="pagination">
-            <button onclick="displayPage(currentPage - 1)" id="prevPageBtn">Previous</button>
-        
-            <button onclick="displayPage(currentPage - 3)" ${currentPage - 3 < 1 ? 'disabled' : ''}>&laquo; -3</button>
-            <button onclick="displayPage(currentPage - 2)" ${currentPage - 2 < 1 ? 'disabled' : ''}>&laquo; -2</button>
-            <button onclick="displayPage(currentPage - 1)" ${currentPage - 1 < 1 ? 'disabled' : ''}>&laquo; -1</button>
-        
+            <button id="prevPageBtn">Previous</button>
+            <button id="pageMinus3">&laquo; -3</button>
+            <button id="pageMinus2">&laquo; -2</button>
+            <button id="pageMinus1">&laquo; -1</button>
+
             <input type="number" id="pageJumpInput" placeholder="Page" min="1" style="width: 50px; text-align: center;">
-            <button onclick="jumpToPage()">Go</button>
-        
-            <button onclick="displayPage(currentPage + 1)" ${currentPage + 1 > totalPages ? 'disabled' : ''}>&raquo; +1</button>
-            <button onclick="displayPage(currentPage + 2)" ${currentPage + 2 > totalPages ? 'disabled' : ''}>&raquo; +2</button>
-            <button onclick="displayPage(currentPage + 3)" ${currentPage + 3 > totalPages ? 'disabled' : ''}>&raquo; +3</button>
-        
-            <button onclick="displayPage(currentPage + 1)" id="nextPageBtn">Next</button>
+            <button id="jumpToPageBtn">Go</button>
+
+            <button id="pagePlus1">&raquo; +1</button>
+            <button id="pagePlus2">&raquo; +2</button>
+            <button id="pagePlus3">&raquo; +3</button>
+
+            <button id="nextPageBtn">Next</button>
         
             <div class="rows-per-page-container">
                 <label for="rowsPerPageSelect">Rows per page:</label>

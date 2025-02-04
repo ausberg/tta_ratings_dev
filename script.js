@@ -45,10 +45,6 @@ async function loadCSV(filename = "ratings_overall.csv") {
 
         // Display the first page of data
         displayPage(1);
-        
-        // Enable sorting and filtering functionality
-        addSorting();
-        setupFilterButtons();
 
         // Reset the search input field
         document.getElementById("search").value = "";
@@ -63,11 +59,16 @@ async function loadCSV(filename = "ratings_overall.csv") {
         document.getElementById("ratings-title").textContent = `ruby_buby's Mid-Season Ratings (${titleMap[filename].replace(" Ratings", "")})`;
 
         // Update the export button to download the currently selected file
-        document.getElementById("export-btn").setAttribute("onclick", `exportCSV('${filename}')`);
+        document.getElementById("export-btn").setAttribute("data-filename", filename);
     
     } catch (error) {
         console.error("Error loading CSV:", error);
     }
+
+    // Enable sorting and filtering functionality
+    addSorting();
+    setupFilterButtons();
+
 }
 
 async function fetchLastCommitDate() {
@@ -92,23 +93,29 @@ async function fetchLastCommitDate() {
 fetchLastCommitDate();
 
 function addSorting() {
-    // Select all table header elements and add a click event listener to each
+    // Remove existing event listeners to prevent duplication
+    document.querySelectorAll("th").forEach(th => {
+        let newTh = th.cloneNode(true);
+        th.parentNode.replaceChild(newTh, th);
+    });
+
+    // Select all table headers and add a click event listener to each
     document.querySelectorAll("th").forEach((th, index) => {
-    th.addEventListener("click", function (event) {
-        // Ignore clicks on filter buttons
-        if (event.target.classList.contains("filter-btn")) return;
+        th.addEventListener("click", function (event) {
+            // Ignore clicks on filter buttons
+            if (event.target.classList.contains("filter-btn")) return;
 
-        // Toggle sort direction for the clicked column
-        sortDirection[index] = sortDirection[index] ? -sortDirection[index] : 1;
+            // Toggle sort direction for the clicked column
+            sortDirection[index] = sortDirection[index] ? -sortDirection[index] : 1;
 
-        // Determine the data to sort (filtered rows if any, otherwise all rows)
-        let dataToSort = filteredRows.length > 0 ? filteredRows : allRows;
+            // Determine the data to sort (filtered rows if any, otherwise all rows)
+            let dataToSort = filteredRows.length > 0 ? filteredRows : allRows;
 
-        // Sort the data based on the clicked column and sort direction
-        dataToSort.sort((a, b) => sortDirection[index] * a[index].localeCompare(b[index], undefined, { numeric: true }));
+            // Sort the data based on the clicked column and sort direction
+            dataToSort.sort((a, b) => sortDirection[index] * a[index].localeCompare(b[index], undefined, { numeric: true }));
 
-        // Display the first page of the sorted data
-        displayPage(1);
+            // Display the first page of the sorted data
+            displayPage(1);
         });
     });
 }
@@ -400,7 +407,10 @@ function updatePagination(page) {
 }
 
 // Exports the selected CSV file for download
-function exportCSV(filename) {
+function exportCSV() {
+    const exportBtn = document.getElementById("export-btn");
+    const filename = exportBtn.getAttribute("data-filename") || "ratings_overall.csv"; // Default if missing
+
     let csvURL = `https://raw.githubusercontent.com/ausberg/tta_ratings/main/ratings/${filename}`;
 
     // Fetch the CSV file from the given URL
@@ -410,12 +420,32 @@ function exportCSV(filename) {
             // Create a temporary link element to trigger the file download
             let link = document.createElement("a");
             link.href = window.URL.createObjectURL(blob);
-            link.download = filename; // Set the filename for download
+            link.download = filename; // Use the detected filename
             document.body.appendChild(link);
             link.click(); // Simulate a click to start download
             document.body.removeChild(link); // Remove the link after download
         })
         .catch(error => console.error("Error downloading CSV:", error)); // Handle errors
+}
+
+function exportAllCSV() {
+    const filenames = ["ratings_overall.csv", "ratings_2p.csv", "ratings_3p.csv", "ratings_4p.csv"];
+
+    filenames.forEach(filename => {
+        let csvURL = `https://raw.githubusercontent.com/ausberg/tta_ratings/main/ratings/${filename}`;
+
+        fetch(csvURL)
+            .then(response => response.blob()) // Convert response to Blob
+            .then(blob => {
+                let link = document.createElement("a");
+                link.href = window.URL.createObjectURL(blob);
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click(); // Trigger download
+                document.body.removeChild(link);
+            })
+            .catch(error => console.error(`Error downloading ${filename}:`, error));
+    });
 }
 
 // Searches the table for rows that match the input query
@@ -448,6 +478,47 @@ function searchTable() {
     displayPage(pageNumber);
 }
 
+// Attach event listeners when DOM is fully loaded
+document.addEventListener("DOMContentLoaded", function () {
+    function safeAddListener(id, event, handler) {
+        const element = document.getElementById(id);
+        if (element) {
+            element.addEventListener(event, handler);
+        }
+    }
+
+    // Attach event listeners for rating buttons
+    safeAddListener("overallRatingsBtn", "click", () => loadCSV("ratings_overall.csv"));
+    safeAddListener("ratings2pBtn", "click", () => loadCSV("ratings_2p.csv"));
+    safeAddListener("ratings3pBtn", "click", () => loadCSV("ratings_3p.csv"));
+    safeAddListener("ratings4pBtn", "click", () => loadCSV("ratings_4p.csv"));
+
+    // Attach event listeners for export buttons
+    safeAddListener("export-btn", "click", exportCSV);
+    safeAddListener("exportAllBtn", "click", exportAllCSV);
+
+    // Attach event listeners to pagination buttons
+    safeAddListener("prevPageBtn", "click", () => displayPage(currentPage - 1));
+    safeAddListener("pageMinus3", "click", () => displayPage(currentPage - 3));
+    safeAddListener("pageMinus2", "click", () => displayPage(currentPage - 2));
+    safeAddListener("pageMinus1", "click", () => displayPage(currentPage - 1));
+    safeAddListener("jumpToPageBtn", "click", jumpToPage);
+    safeAddListener("pagePlus1", "click", () => displayPage(currentPage + 1));
+    safeAddListener("pagePlus2", "click", () => displayPage(currentPage + 2));
+    safeAddListener("pagePlus3", "click", () => displayPage(currentPage + 3));
+    safeAddListener("nextPageBtn", "click", () => displayPage(currentPage + 1));
+
+    // Attach event listeners for filter buttons
+    safeAddListener("applyFilterBtn", "click", applyColumnFilter);
+    safeAddListener("clearFilterBtn", "click", clearColumnFilter);
+
+    // Attach event listener for search function
+    const searchInput = document.getElementById("search");
+    if (searchInput) {
+        searchInput.addEventListener("input", searchTable);
+    }
+});
+
 // Load the table on page load
 window.onload = async function() {
     rowsPerPage = calculateRowsPerPage();
@@ -461,3 +532,5 @@ window.onload = async function() {
 
     fetchLastCommitDate(); // Ensure last updated date is fetched
 };
+
+

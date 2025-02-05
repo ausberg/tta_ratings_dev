@@ -4,6 +4,7 @@ const highlightColumns = [1, 4, 6, 8, 18];
 let sortDirection = {};
 let filteredRows = [];
 let rowsPerPage = calculateRowsPerPage();
+let currentDataset = null; // Track the currently loaded dataset
 
 function calculateRowsPerPage() {
     const tableContainer = document.querySelector(".table-container");
@@ -18,27 +19,32 @@ function calculateRowsPerPage() {
 }
 
 async function loadCSV(filename = "ratings_overall.csv") {
+    if (currentDataset === filename) return; // Prevent duplicate loading
+    currentDataset = filename; // Update the current dataset
+
+    // Store the current search query before reloading the dataset
+    const searchInput = document.getElementById("search");
+    const previousSearch = searchInput.value.trim(); // ✅ Store the current search value
+
     // Construct the URL for fetching the CSV file
     const csvURL = `https://raw.githubusercontent.com/ausberg/tta_ratings/main/ratings/${filename}`;
-    
+
     try {
-        console.log(`Fetching: ${csvURL}`); 
-        
+        console.log(`Fetching: ${csvURL}`);
+
         // Fetch the CSV data from GitHub
         const response = await fetch(csvURL);
-        
-        // Handle errors if the file doesn't load properly
+
         if (!response.ok) {
             throw new Error(`Failed to load ${filename}, status: ${response.status}`);
         }
 
-        // Read the response as text
         const data = await response.text();
-        console.log("CSV Data Loaded:", data.substring(0, 500)); // Log preview of data
+        console.log("CSV Data Loaded:", data.substring(0, 500));
 
         // Split CSV into rows, ignoring the header row
         const rows = data.trim().split("\n").slice(1);
-        
+
         // Convert each row into an array of values, ignoring empty rows
         allRows = rows.map(row => row.split(/,|;/).slice(0, 19)).filter(columns => columns.length === 19);
         console.log("Parsed Rows:", allRows.length, "rows loaded");
@@ -46,8 +52,8 @@ async function loadCSV(filename = "ratings_overall.csv") {
         // Display the first page of data
         displayPage(1);
 
-        // Reset the search input field
-        document.getElementById("search").value = "";
+        // ✅ Do NOT reset the search input field!
+        // searchInput.value = "";  <-- ❌ Removed to keep search text
 
         // Update the page title based on the selected dataset
         const titleMap = {
@@ -59,8 +65,14 @@ async function loadCSV(filename = "ratings_overall.csv") {
         document.getElementById("ratings-title").textContent = `ruby_buby's Mid-Season Ratings (${titleMap[filename].replace(" Ratings", "")})`;
 
         // Update the export button to download the currently selected file
-        document.getElementById("export-btn").setAttribute("data-filename", filename);
-    
+        document.getElementById("ctrl-btn").setAttribute("data-filename", filename);
+
+        // ✅ Restore the search filter after the new dataset loads
+        setTimeout(() => {
+            searchInput.value = previousSearch; // ✅ Restore the search text
+            searchTable(); // ✅ Reapply the search filter
+        }, 500); // Small delay to ensure table renders first
+
     } catch (error) {
         console.error("Error loading CSV:", error);
     }
@@ -68,7 +80,6 @@ async function loadCSV(filename = "ratings_overall.csv") {
     // Enable sorting and filtering functionality
     addSorting();
     setupFilterButtons();
-
 }
 
 async function fetchLastCommitDate() {
@@ -213,19 +224,6 @@ function applyColumnFilter() {
     hideFilterMenu(); // Close the filter menu
 }
 
-// Updates the table display with filtered results
-function displayFilteredResults(filteredRows) {
-    // Generate HTML for filtered rows and insert into the table body
-    let tableBody = filteredRows.map(columns => `
-        <tr>
-            ${columns.map((col, index) => formatColumn(col, index)).join('')}
-        </tr>
-    `).join('');
-
-    // Insert the filtered rows into the table body
-    document.getElementById("ratings-table-body").innerHTML = tableBody;
-}
-
 // Clears the applied column filter and resets the table to show all data
 function clearColumnFilter() {
     filteredRows = [];  // Reset the filtered dataset
@@ -254,31 +252,6 @@ function displayPage(page) {
     document.getElementById("ratings-table-body").innerHTML = tableBody;
 
     updatePagination(page);
-}
-
-// Formats a table column, adding color styling for highlight columns
-function formatColumn(value, index) {
-    // Define the column index of RD Delta (assuming it's column 8)
-    const rdDeltaColumnIndex = 8;
-
-    // Skip formatting if it's the RD Delta column
-    if (index === rdDeltaColumnIndex) {
-        return `<td>${value}</td>`;
-    }
-
-    // Apply highlight formatting to other columns
-    if (highlightColumns.includes(index)) {
-        let num = parseFloat(value);
-
-        if (!isNaN(num)) {
-            let formattedValue = (num > 0 ? `+${num}` : num); // Add "+" for positive values
-            let className = num > 0 ? "positive" : num < 0 ? "negative" : "";
-            return `<td class="${className}">${formattedValue}</td>`;
-        }
-    }
-    
-    // Return the value as a standard table cell
-    return `<td>${value}</td>`;
 }
 
 // Function to update rows per page dynamically
@@ -408,7 +381,7 @@ function updatePagination(page) {
 
 // Exports the selected CSV file for download
 function exportCSV() {
-    const exportBtn = document.getElementById("export-btn");
+    const exportBtn = document.getElementById("ctrl-btn");
     const filename = exportBtn.getAttribute("data-filename") || "ratings_overall.csv"; // Default if missing
 
     let csvURL = `https://raw.githubusercontent.com/ausberg/tta_ratings/main/ratings/${filename}`;
@@ -450,35 +423,94 @@ function exportAllCSV() {
 
 // Searches the table for rows that match the input query
 function searchTable() {
-    const query = document.getElementById("search").value.toLowerCase();
+    const query = document.getElementById("search").value.trim();
 
-    // If the search box is empty, reset the table to its default state
+    // If the search box is empty, reset to full table
     if (!query) {
-        displayPage(1);
+        filteredRows = []; // Clear the filtered list
+        displayPage(1); // Restore full dataset
         return;
     }
 
-    // Find the first row index that contains the search query
-    let foundIndex = allRows.findIndex(row =>
-        row.some(cell => cell && cell.toLowerCase().includes(query))
+    // Split input by commas and trim spaces
+    let searchNames = query.split(",").map(name => name.trim().toLowerCase());
+
+    // Filter rows where the Player column (index 2) contains any of the search terms
+    filteredRows = allRows.filter(row => 
+        searchNames.some(name => row[2].toLowerCase().includes(name))
     );
 
-    if (foundIndex === -1) {
-        alert("Player not found.");
+    if (filteredRows.length === 0) {
         return;
     }
 
-    // Calculate the page number based on the found index
+    displayFilteredResults(filteredRows);
+}
+
+// Display full rows of filtered results (not just player names)
+function displayFilteredResults(filteredRows) {
+    let tableBody = filteredRows.map(columns => `
+        <tr>
+            ${columns.map((col, index) => formatColumn(col, index)).join('')} 
+        </tr>
+    `).join('');
+
+    document.getElementById("ratings-table-body").innerHTML = tableBody;
+}
+
+function jumpToPlayer() {
+    const query = document.getElementById("search").value.trim();
+
+    // Check if multiple names are entered
+    if (query.includes(",")) {
+        alert("Please enter only one name to jump to a page.");
+        return;
+    }
+
+    // If search box is empty, do nothing
+    if (!query) return;
+
+    let playerName = query.toLowerCase();
+
+    // Reset filtering to ensure full dataset is used
+    filteredRows = [];
+
+    // Find the index of the player in the full dataset
+    let foundIndex = allRows.findIndex(row => row[2].toLowerCase() === playerName);
+
+    if (foundIndex === -1) {
+        alert(`Player "${query}" not found.`);
+        return;
+    }
+
+    // Calculate the page number where the player is located
     let pageNumber = Math.floor(foundIndex / rowsPerPage) + 1;
 
-    // Highlight the row by setting a global variable
+    // Highlight the row
     window.highlightRowIndex = foundIndex;
 
-    // Jump to the page where the player is located
+    // Ensure full table is displayed before jumping
     displayPage(pageNumber);
 }
 
-// Attach event listeners when DOM is fully loaded
+// Ensure the highlight formatting applies correctly
+function formatColumn(value, index) {
+    // Columns where highlight formatting applies
+    const highlightColumns = [1, 4, 6, 8, 18]; // Adjust as needed
+
+    if (highlightColumns.includes(index)) {
+        let num = parseFloat(value);
+
+        if (!isNaN(num)) {
+            let formattedValue = (num > 0 ? `+${num}` : num); // Add "+" for positive values
+            let className = num > 0 ? "positive" : num < 0 ? "negative" : "";
+            return `<td class="${className}">${formattedValue}</td>`;
+        }
+    }
+    
+    return `<td>${value}</td>`;
+}
+
 document.addEventListener("DOMContentLoaded", function () {
     function safeAddListener(id, event, handler) {
         const element = document.getElementById(id);
@@ -487,17 +519,66 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // Attach event listeners for rating buttons
+    const searchInput = document.getElementById("search");
+    const jumpButton = document.getElementById("jumpToPlayerBtn");
+    let currentDataset = null; // Track the currently loaded dataset
+    let activeButton = document.getElementById("overallRatingsBtn"); // Default active button
+
+    // ✅ Prevent duplicate dataset loading
+    document.querySelectorAll(".ctrl-btn").forEach(button => {
+        button.addEventListener("click", function () {
+            const filename = this.getAttribute("data-filename");
+    
+            if (currentDataset !== filename) {  
+                currentDataset = filename;
+                loadCSV(filename);
+                setActiveButton(this); // ✅ Call function to highlight active button
+                
+                setTimeout(() => {
+                    searchTable(); // Reapply search filter after data loads
+                }, 500);
+            }
+        });
+    });    
+
+    // ✅ Ensure only one button is active at a time
+    function setActiveButton(selectedButton) {
+        document.querySelectorAll(".ctrl-btn").forEach(btn => btn.classList.remove("active-btn"));
+        selectedButton.classList.add("active-btn");
+        activeButton = selectedButton;
+    }
+
+    // ✅ Search input event listener
+    if (searchInput) {
+        searchInput.addEventListener("input", function () {
+            let query = searchInput.value.trim();
+            let nameList = query.split(",").map(name => name.trim()).filter(name => name !== "");
+
+            if (nameList.length > 8) {
+                alert("You can only enter up to 8 names.");
+                searchInput.value = nameList.slice(0, 8).join(", ");
+            }
+
+            searchTable(); // Ensure table filters properly
+        });
+    }
+
+    // ✅ Jump to Player button event listener
+    if (jumpButton) {
+        jumpButton.addEventListener("click", jumpToPlayer);
+    }
+
+    // ✅ Attach event listeners for rating buttons (load CSVs)
     safeAddListener("overallRatingsBtn", "click", () => loadCSV("ratings_overall.csv"));
     safeAddListener("ratings2pBtn", "click", () => loadCSV("ratings_2p.csv"));
     safeAddListener("ratings3pBtn", "click", () => loadCSV("ratings_3p.csv"));
     safeAddListener("ratings4pBtn", "click", () => loadCSV("ratings_4p.csv"));
 
-    // Attach event listeners for export buttons
-    safeAddListener("export-btn", "click", exportCSV);
+    // ✅ Attach event listeners for export buttons
+    safeAddListener("ctrl-btn", "click", exportCSV);
     safeAddListener("exportAllBtn", "click", exportAllCSV);
 
-    // Attach event listeners to pagination buttons
+    // ✅ Attach event listeners to pagination buttons
     safeAddListener("prevPageBtn", "click", () => displayPage(currentPage - 1));
     safeAddListener("pageMinus3", "click", () => displayPage(currentPage - 3));
     safeAddListener("pageMinus2", "click", () => displayPage(currentPage - 2));
@@ -508,14 +589,13 @@ document.addEventListener("DOMContentLoaded", function () {
     safeAddListener("pagePlus3", "click", () => displayPage(currentPage + 3));
     safeAddListener("nextPageBtn", "click", () => displayPage(currentPage + 1));
 
-    // Attach event listeners for filter buttons
+    // ✅ Attach event listeners for filter buttons
     safeAddListener("applyFilterBtn", "click", applyColumnFilter);
     safeAddListener("clearFilterBtn", "click", clearColumnFilter);
 
-    // Attach event listener for search function
-    const searchInput = document.getElementById("search");
-    if (searchInput) {
-        searchInput.addEventListener("input", searchTable);
+    // ✅ Ensure default button is active on page load
+    if (activeButton) {
+        activeButton.classList.add("active-btn");
     }
 });
 
@@ -532,5 +612,3 @@ window.onload = async function() {
 
     fetchLastCommitDate(); // Ensure last updated date is fetched
 };
-
-

@@ -1,3 +1,7 @@
+/* ========================== */
+/*         GENERAL            */
+/* ========================== */
+
 body {
     font-family: Arial, sans-serif;
     margin: 10px;
@@ -15,87 +19,20 @@ body {
     justify-content: center;
 }
 
-table {
-    width: auto;
-    margin: 0 auto;
-    border-collapse: collapse;
-    white-space: nowrap;
-}
+/* ========================== */
+/*         TABLE STYLES       */
+/* ========================== */
 
 .table-container {
     overflow-x: auto;
     max-width: 100%;
 }
 
-.controls-container { 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center; 
-    flex-wrap: nowrap; 
-    margin-bottom: 10px; 
-    max-width: 1600px; 
-    margin-left: auto; 
-    margin-right: auto; 
-}
-
-.controls-section { 
-    display: flex; 
-    align-items: center; 
-    gap: 10px; 
-}
-
-.left-controls { flex: 1; justify-content: flex-start; }
-.search-container { flex: 0; width: 1100px; text-align: center; margin-left: -300px; }
-.right-controls { flex: 1; justify-content: flex-end; }
-
-@media screen and (max-width: 768px) {
-    table { font-size: 12px; }
-    th, td { padding: 5px; white-space: nowrap; }
-
-    .controls-container { 
-        flex-direction: column; 
-        align-items: center; 
-        gap: 10px; 
-        width: 100%;
-    } 
-
-    .left-controls, .right-controls, .search-container { 
-        width: 100%; 
-        display: flex;
-        justify-content: center; 
-        flex-wrap: wrap;
-    }
-
-    .export-btn, .filter-btn { 
-        width: 45%;
-        max-width: 250px;
-        margin: 5px;
-    }
-
-    .search-container input { 
-        width: 90%; 
-        max-width: 300px;
-        margin-top: 5px;
-    }
-
-    .table-container {
-        overflow-x: auto;
-        width: 100%;
-    }
-
-    table {
-        display: block;
-        overflow-x: auto;
-        white-space: nowrap;
-    }
-
-    th { 
-        text-align: center; 
-        padding: 8px; 
-        font-size: 14px; 
-        position: sticky; 
-        top: 0; 
-    }
+table {
+    width: auto;
+    margin: 0 auto;
+    border-collapse: collapse;
+    white-space: nowrap;
 }
 
 th, td {
@@ -111,6 +48,8 @@ th {
     background-color: #A67B5B;
     color: black;
     cursor: pointer;
+    position: sticky;
+    top: 0;
 }
 
 th:hover {
@@ -122,37 +61,110 @@ tr.highlight {
     font-weight: bold;
 }
 
-tr:nth-child(even) {
-    background-color: #F0E4D7;
+tr:nth-child(even) { background-color: #F0E4D7; }
+tr:nth-child(odd) { background-color: #E6D2BA; }
+
+/* Positive & Negative Formatting */
+.positive { color: green; font-weight: bold; }
+.negative { color: red; font-weight: bold; }
+
+/* ========================== */
+/*       CONTROL SECTIONS     */
+/* ========================== */
+
+/* Main controls container */
+.controls-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: nowrap;
+    margin-bottom: 10px;
+    max-width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    gap: 250px;
 }
 
-tr:nth-child(odd) {
-    background-color: #E6D2BA;
+/* Ratings + Search group (Align Left) */
+.controls-section.ratings-search {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    justify-content: flex-start;
 }
 
-.positive {
-    color: green;
+/* Adds space ONLY after the last Ratings button */
+.ratings-spacer {
+    width: 50px; /* Adjust to control space between Ratings and Search */
+    flex-shrink: 0; /* Prevents it from collapsing */
+}
+
+/* Export Buttons (Align Right) */
+.controls-section.export-buttons {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    justify-content: flex-end;
+}
+
+/* Search Bar */
+#search {
+    width: 300px;
+    max-width: 100%;
+    text-align: center;
+    padding: 5px;
+}
+
+/* ========================== */
+/*          BUTTONS           */
+/* ========================== */
+
+.ctrl-btn {
+    padding: 5px 10px;
+    font-size: 13px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    cursor: pointer;
+    height: 30px;
+    min-width: 100px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.ctrl-btn:hover {
+    background-color: #218838;
+}
+
+/* Highlight the active button */
+.ctrl-btn.active-btn {
+    background-color: #1e7e34; /* Darker green */
     font-weight: bold;
+    border: 2px solid #155724; /* Add a subtle border */
 }
 
-.negative {
-    color: red;
-    font-weight: bold;
+/* Filter Buttons */
+.filter-btn {
+    font-size: 13px;
+    background: none;
+    border: none;
+    cursor: pointer;
 }
 
+/* Pagination */
 .pagination {
     display: flex;
     align-items: center;
-    justify-content: center; /* Centers all pagination elements */
+    justify-content: center;
     gap: 15px;
-    width: 100%; /* Ensure it takes full width */
+    width: 100%;
     flex-wrap: wrap;
-    position: relative;
 }
 
 .pagination button {
     padding: 4px 8px;
-    margin: 3px;
     border: none;
     background-color: #A67B5B;
     color: black;
@@ -160,19 +172,14 @@ tr:nth-child(odd) {
     font-size: 13px;
 }
 
-.pagination button:hover {
-    background-color: #8B5A2B;
-}
+.pagination button:hover { background-color: #8B5A2B; }
+.pagination button:disabled { background-color: #ccc; cursor: not-allowed; }
 
-.pagination button:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-}
-
+/* Rows Per Page */
 .rows-per-page-container {
     display: flex;
     align-items: center;
-    gap: 10px; /* More space between Next button and dropdown */
+    gap: 10px;
     margin-left: 15px;
 }
 
@@ -182,26 +189,106 @@ tr:nth-child(odd) {
     cursor: pointer;
 }
 
-.export-btn {
-    margin-top: 5px;
-    padding: 5px 10px;
-    font-size: 13px;
-    background-color: #28a745;
-    color: white;
-    border: none;
-    cursor: pointer;
+/* ========================== */
+/*         TOOLTIPS           */
+/* ========================== */
+
+/* Ensure tooltips appear correctly on inputs */
+.tooltip-btn,
+.tooltip-btn[type="text"] {
+    position: relative;
 }
 
-.export-btn:hover {
-    background-color: #218838;
+/* Tooltip styling */
+.tooltip-btn::after {
+    content: attr(data-tooltip);
+    visibility: hidden;
+    width: 220px;
+    background-color: #fff;
+    color: black;
+    text-align: left;
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid black;
+    position: absolute;
+    bottom: 120%;
+    left: 50%;
+    transform: translateX(-50%);
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+    font-size: 13px;
+    line-height: 1.4;
+    white-space: normal;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+    pointer-events: none;
+    z-index: 1000;
 }
 
-.filter-btn {
-    font-size: 13px;
-    margin-left: 2px;
-    background: none;
-    border: none;
-    cursor: pointer;
+/* Show tooltip on hover (for buttons) */
+.tooltip-btn:hover::after {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Show tooltip when input is focused */
+.tooltip-btn:focus::after {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* ========================== */
+/*       RESPONSIVENESS       */
+/* ========================== */
+
+@media screen and (max-width: 768px) {
+    table { font-size: 12px; }
+    th, td { padding: 5px; white-space: nowrap; }
+
+    .controls-container {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+    }
+
+    .controls-section {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .ctrl-btn, .filter-btn {
+        width: 45%;
+        max-width: 250px;
+        margin: 5px;
+    }
+
+    .search-container input {
+        width: 90%;
+        max-width: 300px;
+        margin-top: 5px;
+    }
+
+    .table-container {
+        overflow-x: auto;
+        width: 100%;
+    }
+
+    table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+}
+
+/* ========================== */
+/*        MISC STYLES         */
+/* ========================== */
+
+h2, p {
+    margin: 5px 0;
+    text-align: center;
 }
 
 .filter-menu {
@@ -219,9 +306,4 @@ tr:nth-child(odd) {
     padding: 4px;
     margin-bottom: 4px;
     border: 1px solid #A67B5B;
-}
-
-h2, p {
-    margin: 5px 0;
-    text-align: center;
 }

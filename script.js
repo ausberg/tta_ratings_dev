@@ -82,10 +82,9 @@ function formatColumn(value, index) {
 
     let num = parseFloat(value);
 
-    // Special case: Make column 11 red
-    if (index === 11) {
-        let formattedValue = (!isNaN(num) && num > 0) ? `+${num}` : num;
-        return `<td class="red">${isNaN(num) ? value : formattedValue}</td>`;
+    // Special case: Column 11 should be red **only if the value is greater than 0**
+    if (index === 11 && !isNaN(num) && num > 0) {
+        return `<td class="red">+${num}</td>`;
     }
 
     // Apply highlight formatting for other columns

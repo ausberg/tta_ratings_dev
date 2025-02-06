@@ -18,68 +18,38 @@ function calculateRowsPerPage() {
     return Math.max(10, Math.floor(availableHeight / rowHeight) - 4);
 }
 
-async function loadCSV(filename = "ratings_overall.csv") {
-    if (currentDataset === filename) return; // Prevent duplicate loading
-    currentDataset = filename; // Update the current dataset
+async function loadCSV(filename = "ratings_overall.csv", preservePage = false) {
+    if (!filename || filename === "null") {  // Prevent loading null dataset
+        console.error("Error: Attempted to load an invalid dataset:", filename);
+        return;
+    }
 
-    // Store the current search query before reloading the dataset
+    if (currentDataset === filename) return; // Prevent redundant loads
+    currentDataset = filename; // Ensure correct dataset tracking
+
     const searchInput = document.getElementById("search");
-    const previousSearch = searchInput.value.trim(); // ✅ Store the current search value
-
-    // Construct the URL for fetching the CSV file
-    const csvURL = `https://raw.githubusercontent.com/ausberg/tta_ratings/main/ratings/${filename}`;
+    const previousSearch = searchInput.value.trim();
+    let lastPage = preservePage ? currentPage : 1;
 
     try {
-        console.log(`Fetching: ${csvURL}`);
+        // console.log(`Fetching: ${filename}`);
 
-        // Fetch the CSV data from GitHub
-        const response = await fetch(csvURL);
-
-        if (!response.ok) {
-            throw new Error(`Failed to load ${filename}, status: ${response.status}`);
-        }
+        const response = await fetch(`https://raw.githubusercontent.com/ausberg/tta_ratings/main/ratings/${filename}`);
+        if (!response.ok) throw new Error(`Failed to load ${filename}, status: ${response.status}`);
 
         const data = await response.text();
-        console.log("CSV Data Loaded:", data.substring(0, 500));
+        allRows = data.trim().split("\n").slice(1).map(row => row.split(/,|;/).slice(0, 19)).filter(columns => columns.length === 19);
+        
+        // console.log("Rows loaded:", allRows.length);
+        displayPage(lastPage);
 
-        // Split CSV into rows, ignoring the header row
-        const rows = data.trim().split("\n").slice(1);
-
-        // Convert each row into an array of values, ignoring empty rows
-        allRows = rows.map(row => row.split(/,|;/).slice(0, 19)).filter(columns => columns.length === 19);
-        console.log("Parsed Rows:", allRows.length, "rows loaded");
-
-        // Display the first page of data
-        displayPage(1);
-
-        // ✅ Do NOT reset the search input field!
-        // searchInput.value = "";  <-- ❌ Removed to keep search text
-
-        // Update the page title based on the selected dataset
-        const titleMap = {
-            "ratings_overall.csv": "Overall Ratings",
-            "ratings_2p.csv": "2-Player Ratings",
-            "ratings_3p.csv": "3-Player Ratings",
-            "ratings_4p.csv": "4-Player Ratings"
-        };
-        document.getElementById("ratings-title").textContent = `ruby_buby's Mid-Season Ratings (${titleMap[filename].replace(" Ratings", "")})`;
-
-        // Update the export button to download the currently selected file
-        document.getElementById("ctrl-btn").setAttribute("data-filename", filename);
-
-        // ✅ Restore the search filter after the new dataset loads
         setTimeout(() => {
-            searchInput.value = previousSearch; // ✅ Restore the search text
-            searchTable(); // ✅ Reapply the search filter
-        }, 500); // Small delay to ensure table renders first
-
+            searchInput.value = previousSearch;
+            searchTable();
+        }, 300);
     } catch (error) {
         console.error("Error loading CSV:", error);
     }
-
-    // Enable sorting and filtering functionality
-    addSorting();
-    setupFilterButtons();
 }
 
 async function fetchLastCommitDate() {
@@ -233,25 +203,35 @@ function clearColumnFilter() {
 
 // Displays a specific page of data in the table
 function displayPage(page) {
+    let dataToDisplay = filteredRows.length > 0 ? filteredRows : allRows;
+    const totalPages = Math.ceil(dataToDisplay.length / rowsPerPage);
+
+    if (page < 1 || page > totalPages) {
+        // console.warn(`Page ${page} is out of bounds. Total pages available: ${totalPages}`);
+        return;
+    }
+
+    currentPage = page; // Ensure correct page is stored
 
     const start = (page - 1) * rowsPerPage;
     const end = start + rowsPerPage;
-
-    let dataToDisplay = filteredRows.length > 0 ? filteredRows : allRows;
     const pageRows = dataToDisplay.slice(start, end);
+
+    if (pageRows.length === 0) {
+        console.warn("No rows to display on this page.");
+    }
 
     let tableBody = pageRows.map((columns, rowIndex) => {
         let globalRowIndex = start + rowIndex;
         let highlightClass = (globalRowIndex === window.highlightRowIndex) ? "highlight" : "";
 
-        return `<tr class="${highlightClass}">
-            ${columns.map((col, index) => formatColumn(col, index)).join('')}
-        </tr>`;
+        return `<tr class="${highlightClass}">${columns.map((col, index) => formatColumn(col, index)).join('')}</tr>`;
     }).join('');
 
     document.getElementById("ratings-table-body").innerHTML = tableBody;
-
     updatePagination(page);
+
+    // console.log(`Displayed Page: ${page}, Highlighted Row Index: ${window.highlightRowIndex}`);
 }
 
 // Function to update rows per page dynamically
@@ -262,16 +242,18 @@ function updateRowsPerPage() {
 }
 
 function jumpToPage() {
-    const totalPages = Math.ceil(allRows.length / rowsPerPage); // Get total pages
     let pageInput = document.getElementById("pageJumpInput").value.trim();
-
-    // Convert input to an integer and validate
     let targetPage = parseInt(pageInput);
-    if (!isNaN(targetPage) && targetPage >= 1 && targetPage <= totalPages) {
-        displayPage(targetPage); // Jump to the entered page
-    } else {
-        alert(`Please enter a valid page number between 1 and ${totalPages}`);
+
+    if (isNaN(targetPage) || targetPage < 1 || targetPage > Math.ceil((filteredRows.length > 0 ? filteredRows.length : allRows.length) / rowsPerPage)) {
+        alert("Invalid page number.");
+        return;
     }
+
+    // console.log("Jumping to page:", targetPage);
+
+    currentPage = targetPage;
+    displayPage(currentPage);  // Ensure table updates after page jump
 }
 
 // Updates the pagination controls based on the current page
@@ -381,24 +363,24 @@ function updatePagination(page) {
 
 // Exports the selected CSV file for download
 function exportCSV() {
-    const exportBtn = document.getElementById("ctrl-btn");
-    const filename = exportBtn.getAttribute("data-filename") || "ratings_overall.csv"; // Default if missing
+    if (!currentDataset) {
+        console.error("Error: No dataset is currently loaded.");
+        return;
+    }
 
-    let csvURL = `https://raw.githubusercontent.com/ausberg/tta_ratings/main/ratings/${filename}`;
+    let csvURL = `https://raw.githubusercontent.com/ausberg/tta_ratings/main/ratings/${currentDataset}`;
 
-    // Fetch the CSV file from the given URL
     fetch(csvURL)
         .then(response => response.blob()) // Convert response to a Blob object
         .then(blob => {
-            // Create a temporary link element to trigger the file download
             let link = document.createElement("a");
             link.href = window.URL.createObjectURL(blob);
-            link.download = filename; // Use the detected filename
+            link.download = currentDataset; // Uses the correct dataset filename
             document.body.appendChild(link);
-            link.click(); // Simulate a click to start download
-            document.body.removeChild(link); // Remove the link after download
+            link.click(); 
+            document.body.removeChild(link);
         })
-        .catch(error => console.error("Error downloading CSV:", error)); // Handle errors
+        .catch(error => console.error("Error downloading CSV:", error));
 }
 
 function exportAllCSV() {
@@ -459,38 +441,38 @@ function displayFilteredResults(filteredRows) {
 }
 
 function jumpToPlayer() {
-    const query = document.getElementById("search").value.trim();
+    const searchInput = document.getElementById("search");
+    const query = searchInput.value.trim().toLowerCase();
 
-    // Check if multiple names are entered
-    if (query.includes(",")) {
-        alert("Please enter only one name to jump to a page.");
+    if (!query || query.includes(",")) {
+        alert("Please enter only one player's name.");
         return;
     }
 
-    // If search box is empty, do nothing
-    if (!query) return;
-
-    let playerName = query.toLowerCase();
-
-    // Reset filtering to ensure full dataset is used
-    filteredRows = [];
-
-    // Find the index of the player in the full dataset
-    let foundIndex = allRows.findIndex(row => row[2].toLowerCase() === playerName);
+    // Find the player's index in the FULL dataset (allRows)
+    let foundIndex = allRows.findIndex(row => row[2].toLowerCase() === query);
 
     if (foundIndex === -1) {
         alert(`Player "${query}" not found.`);
         return;
     }
 
-    // Calculate the page number where the player is located
     let pageNumber = Math.floor(foundIndex / rowsPerPage) + 1;
+    // console.log(`Jumping to Page: ${pageNumber} for player: ${query}`);
 
-    // Highlight the row
+    // Preserve the highlight row index
     window.highlightRowIndex = foundIndex;
 
-    // Ensure full table is displayed before jumping
-    displayPage(pageNumber);
+    // Clear search input to prevent filtering issues
+    searchInput.value = "";
+    filteredRows = [];
+
+    // Reload dataset without forcing a reset to Page 1
+    loadCSV(currentDataset, true);
+
+    setTimeout(() => {
+        displayPage(pageNumber);
+    }, 300); // Ensure dataset loads first
 }
 
 // Ensure the highlight formatting applies correctly
@@ -524,31 +506,37 @@ document.addEventListener("DOMContentLoaded", function () {
     let currentDataset = null; // Track the currently loaded dataset
     let activeButton = document.getElementById("overallRatingsBtn"); // Default active button
 
-    // ✅ Prevent duplicate dataset loading
+    // Prevent duplicate dataset loading
     document.querySelectorAll(".ctrl-btn").forEach(button => {
         button.addEventListener("click", function () {
             const filename = this.getAttribute("data-filename");
     
+            // Ensure only dataset-switching buttons trigger loadCSV
+            if (!filename) {
+                if (this.id !== "jumpToPlayerBtn") { // Allow "Show Player Page" button to function normally
+                    // console.warn("Skipping button click - No dataset filename provided:", this.innerText);
+                }
+                return;
+            }
+    
             if (currentDataset !== filename) {  
                 currentDataset = filename;
-                loadCSV(filename);
-                setActiveButton(this); // ✅ Call function to highlight active button
-                
-                setTimeout(() => {
-                    searchTable(); // Reapply search filter after data loads
-                }, 500);
+                loadCSV(filename, true); // Preserve the current page
+    
+                // Mark the clicked button as active
+                setActiveButton(this);
             }
         });
-    });    
+    });                     
 
-    // ✅ Ensure only one button is active at a time
+    // Ensure only one button is active at a time
     function setActiveButton(selectedButton) {
         document.querySelectorAll(".ctrl-btn").forEach(btn => btn.classList.remove("active-btn"));
         selectedButton.classList.add("active-btn");
         activeButton = selectedButton;
     }
 
-    // ✅ Search input event listener
+    // Search input event listener
     if (searchInput) {
         searchInput.addEventListener("input", function () {
             let query = searchInput.value.trim();
@@ -563,22 +551,22 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // ✅ Jump to Player button event listener
+    // Jump to Player button event listener
     if (jumpButton) {
         jumpButton.addEventListener("click", jumpToPlayer);
     }
 
-    // ✅ Attach event listeners for rating buttons (load CSVs)
+    // Attach event listeners for rating buttons (load CSVs)
     safeAddListener("overallRatingsBtn", "click", () => loadCSV("ratings_overall.csv"));
     safeAddListener("ratings2pBtn", "click", () => loadCSV("ratings_2p.csv"));
     safeAddListener("ratings3pBtn", "click", () => loadCSV("ratings_3p.csv"));
     safeAddListener("ratings4pBtn", "click", () => loadCSV("ratings_4p.csv"));
 
-    // ✅ Attach event listeners for export buttons
+    // Attach event listeners for export buttons
     safeAddListener("ctrl-btn", "click", exportCSV);
     safeAddListener("exportAllBtn", "click", exportAllCSV);
 
-    // ✅ Attach event listeners to pagination buttons
+    // Attach event listeners to pagination buttons
     safeAddListener("prevPageBtn", "click", () => displayPage(currentPage - 1));
     safeAddListener("pageMinus3", "click", () => displayPage(currentPage - 3));
     safeAddListener("pageMinus2", "click", () => displayPage(currentPage - 2));
@@ -589,11 +577,11 @@ document.addEventListener("DOMContentLoaded", function () {
     safeAddListener("pagePlus3", "click", () => displayPage(currentPage + 3));
     safeAddListener("nextPageBtn", "click", () => displayPage(currentPage + 1));
 
-    // ✅ Attach event listeners for filter buttons
+    // Attach event listeners for filter buttons
     safeAddListener("applyFilterBtn", "click", applyColumnFilter);
     safeAddListener("clearFilterBtn", "click", clearColumnFilter);
 
-    // ✅ Ensure default button is active on page load
+    // Ensure default button is active on page load
     if (activeButton) {
         activeButton.classList.add("active-btn");
     }

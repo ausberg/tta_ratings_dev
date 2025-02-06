@@ -21,14 +21,13 @@
         <br>
 
         <p style="text-align: center;"><strong>Additional Tournaments included:</strong><br>
-            Mercurial Ladder Seasons 19 & 20, Sodium Ladder Season 2, Royal League Season 2 Tiebreakers,<br>
-            World Championship 2025 Stages 1 & 2, International Championship Season 19
+            Mercurial Ladder Season 19, Sodium Ladder Season 2, Royal League Season 2 Tiebreakers,<br>
+            World Championship 2025 Stage 1, International Championship Season 19
         </p>
 
         <br>
 
         <div class="controls-container">
-            <!-- Ratings + Search (Grouped Together) -->
             <div class="controls-section ratings-search">
                 <button id="overallRatingsBtn" class="ctrl-btn" data-filename="ratings_overall.csv">Overall Ratings</button>
                 <button id="ratings2pBtn" class="ctrl-btn" data-filename="ratings_2p.csv">2-Player Ratings</button>
@@ -37,23 +36,21 @@
 
                 <div class="ratings-spacer"></div>
 
-                <!-- Search Bar & Jump Button (Now inside Ratings group) -->
                 <input type="text" id="search" class="tooltip-btn" 
                     placeholder="player1, player2, player3, player4, player5, (8 max)"
                     title="Enter a player's name to filter the table.
 
         Use commas to search multiple names, up to 8 names at once.
 
-        You can also jump to a single player's page by entering their name and clicking 'Jump to Page'.">
+        You can also jump to a single player's page by entering their name and clicking 'Show Player Page'.">
 
                 <button id="jumpToPlayerBtn" class="ctrl-btn tooltip-btn"
                     data-tooltip="Click to jump directly to a player's page.&#10;&#10;
                                 Only works if a single name is entered (no commas).">
-                    Jump to Page
+                    Show Player Page
                 </button>
             </div>
         
-            <!-- Export Buttons (Pushed to the Right) -->
             <div class="controls-section export-buttons">
                 <button id="ctrl-btn" class="ctrl-btn tooltip-btn" data-tooltip="Download the currently displayed table data as a CSV file.">Export Current</button>
                 <button id="exportAllBtn" class="ctrl-btn tooltip-btn" data-tooltip="Download all ratings data as a CSV file.">Export All</button>

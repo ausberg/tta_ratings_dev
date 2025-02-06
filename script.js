@@ -38,7 +38,30 @@ async function loadCSV(filename = "ratings_overall.csv", preservePage = false) {
         if (!response.ok) throw new Error(`Failed to load ${filename}, status: ${response.status}`);
 
         const data = await response.text();
-        allRows = data.trim().split("\n").slice(1).map(row => row.split(/,|;/).slice(0, 19)).filter(columns => columns.length === 19);
+        allRows = data.trim().split("\n").slice(1).map(row => {
+            let columns = row.split(/,|;/);
+        
+            // Remove unwanted columns by their index positions (e.g., RD Δ, Opps Δ, W% Δ)
+            let selectedColumns = [
+                columns[0],  // Rank
+                columns[1],  // Rank Δ
+                columns[2],  // Player
+                parseFloat(columns[3]).toFixed(0),  // Cons. Rating
+                parseFloat(columns[4]).toFixed(2),  // Cons. Δ
+                parseFloat(columns[5]).toFixed(0),  // Rating
+                parseFloat(columns[7]).toFixed(1),  // RD
+                parseFloat(columns[9]).toFixed(0),  // Opps
+                parseFloat(columns[10]).toFixed(0),  // Ws
+                parseFloat(columns[15]).toFixed(0),  // Ws Δ
+                parseFloat(columns[11]).toFixed(0),  // Ls
+                parseFloat(columns[16]).toFixed(0),  // Ls Δ
+                parseFloat(columns[12]).toFixed(0),  // Ds
+                parseFloat(columns[13]).toFixed(1),  // Win %
+                parseFloat(columns[18]).toFixed(2)   // W% Δ
+            ];           
+        
+            return selectedColumns;
+        }).filter(columns => columns.length === 15);
         
         // console.log("Rows loaded:", allRows.length);
         displayPage(lastPage);
@@ -50,6 +73,31 @@ async function loadCSV(filename = "ratings_overall.csv", preservePage = false) {
     } catch (error) {
         console.error("Error loading CSV:", error);
     }
+}
+
+// Ensure the highlight formatting applies correctly
+function formatColumn(value, index) {
+    // Columns where highlight formatting applies
+    const highlightColumns = [1, 4, 9, 11, 14]; // Adjust as needed
+
+    let num = parseFloat(value);
+
+    // Special case: Make column 11 red
+    if (index === 11) {
+        let formattedValue = (!isNaN(num) && num > 0) ? `+${num}` : num;
+        return `<td class="red">${isNaN(num) ? value : formattedValue}</td>`;
+    }
+
+    // Apply highlight formatting for other columns
+    if (highlightColumns.includes(index)) {
+        if (!isNaN(num)) {
+            let formattedValue = (num > 0 ? `+${num}` : num); // Add "+" for positive values
+            let className = num > 0 ? "positive" : num < 0 ? "negative" : "";
+            return `<td class="${className}">${formattedValue}</td>`;
+        }
+    }
+
+    return `<td>${value}</td>`;
 }
 
 async function fetchLastCommitDate() {
@@ -473,24 +521,6 @@ function jumpToPlayer() {
     setTimeout(() => {
         displayPage(pageNumber);
     }, 300); // Ensure dataset loads first
-}
-
-// Ensure the highlight formatting applies correctly
-function formatColumn(value, index) {
-    // Columns where highlight formatting applies
-    const highlightColumns = [1, 4, 6, 8, 18]; // Adjust as needed
-
-    if (highlightColumns.includes(index)) {
-        let num = parseFloat(value);
-
-        if (!isNaN(num)) {
-            let formattedValue = (num > 0 ? `+${num}` : num); // Add "+" for positive values
-            let className = num > 0 ? "positive" : num < 0 ? "negative" : "";
-            return `<td class="${className}">${formattedValue}</td>`;
-        }
-    }
-    
-    return `<td>${value}</td>`;
 }
 
 document.addEventListener("DOMContentLoaded", function () {

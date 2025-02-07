@@ -73,6 +73,8 @@ async function loadCSV(filename = "ratings_overall.csv", preservePage = false) {
     } catch (error) {
         console.error("Error loading CSV:", error);
     }
+    setupFilterButtons();
+    addSorting();
 }
 
 // Ensure the highlight formatting applies correctly
@@ -121,28 +123,19 @@ async function fetchLastCommitDate() {
 fetchLastCommitDate();
 
 function addSorting() {
-    // Remove existing event listeners to prevent duplication
-    document.querySelectorAll("th").forEach(th => {
-        let newTh = th.cloneNode(true);
-        th.parentNode.replaceChild(newTh, th);
-    });
-
-    // Select all table headers and add a click event listener to each
     document.querySelectorAll("th").forEach((th, index) => {
         th.addEventListener("click", function (event) {
-            // Ignore clicks on filter buttons
             if (event.target.classList.contains("filter-btn")) return;
 
-            // Toggle sort direction for the clicked column
             sortDirection[index] = sortDirection[index] ? -sortDirection[index] : 1;
-
-            // Determine the data to sort (filtered rows if any, otherwise all rows)
             let dataToSort = filteredRows.length > 0 ? filteredRows : allRows;
 
-            // Sort the data based on the clicked column and sort direction
-            dataToSort.sort((a, b) => sortDirection[index] * a[index].localeCompare(b[index], undefined, { numeric: true }));
+            dataToSort.sort((a, b) => {
+                let valA = isNaN(a[index]) ? a[index] : parseFloat(a[index]);
+                let valB = isNaN(b[index]) ? b[index] : parseFloat(b[index]);
+                return sortDirection[index] * (valA > valB ? 1 : valA < valB ? -1 : 0);
+            });
 
-            // Display the first page of the sorted data
             displayPage(1);
         });
     });
@@ -174,25 +167,18 @@ function handleFilterClick(event) {
 }
 
 function showFilterMenu(index, button) {
-    // Set the active column for filtering
     activeFilterColumn = index;
 
-    // Get filter menu elements
     const filterMenu = document.getElementById("filter-menu");
     const filterTitle = document.getElementById("filter-title");
-    const filterTooltip = document.getElementById("filter-tooltip");
-
-    // Update the filter menu title to show the column being filtered
     filterTitle.textContent = `Filter: ${document.querySelectorAll("th")[index].textContent.trim()}`;
 
-    // Ensure tooltip is visible
-    filterTooltip.style.display = "block";
-
-    // Position the filter menu below the clicked button
     const rect = button.getBoundingClientRect();
     filterMenu.style.display = "block";
     filterMenu.style.left = `${rect.left + window.scrollX}px`;
-    filterMenu.style.top = `${rect.bottom + window.scrollY + 5}px`; // Offset slightly below
+    filterMenu.style.top = `${rect.bottom + window.scrollY + 5}px`;
+
+    document.getElementById("filter-input").value = ""; // Clear previous input
 }
 
 // Hides the filter menu when a filter is applied or dismissed
@@ -202,43 +188,40 @@ function hideFilterMenu() {
 
 // Applies a column filter based on user input
 function applyColumnFilter() {
-    // Get the user input from the filter input box and trim whitespace
     let input = document.getElementById("filter-input").value.trim();
+    if (!input || activeFilterColumn === undefined) return;
 
-    // If no column is active or input is empty, exit function
-    if (!activeFilterColumn || input === "") return;
+    let operator = "=";
+    let condition = input;
 
-    let condition = input;  // Stores the numeric/string value to compare against
-    let operator = "=";  // Default comparison operator (exact match)
-
-    // Regex to check for operators (<=, >=, <, >, =)
     const match = input.match(/^(<=|>=|>|<|=)\s*(.+)$/);
     if (match) {
-        operator = match[1];  // Extract operator (e.g., ">=", "<=", etc.)
-        condition = match[2].trim();  // Extract numeric or string value after the operator
+        operator = match[1];
+        condition = match[2].trim();
     }
 
-    // Filter rows based on the selected column and extracted condition
     filteredRows = allRows.filter(row => {
-        let value = row[activeFilterColumn]; // Get the column value for the current row
+        let value = row[activeFilterColumn];
+        let numericValue = parseFloat(value);
+        let numericCondition = parseFloat(condition);
 
-        // Convert values to numbers if applicable for numeric comparisons
-        if (!isNaN(value)) value = parseFloat(value);
-        if (!isNaN(condition)) condition = parseFloat(condition);
-
-        // Apply the comparison logic based on the operator
-        switch (operator) {
-            case "=": return value == condition; // Exact match
-            case ">": return value > condition;  // Greater than
-            case "<": return value < condition;  // Less than
-            case ">=": return value >= condition; // Greater than or equal to
-            case "<=": return value <= condition; // Less than or equal to
-            default: return false; // If no valid operator found, return false (no match)
+        if (!isNaN(numericValue) && !isNaN(numericCondition)) {
+            switch (operator) {
+                case "=": return numericValue == numericCondition;
+                case ">": return numericValue > numericCondition;
+                case "<": return numericValue < numericCondition;
+                case ">=": return numericValue >= numericCondition;
+                case "<=": return numericValue <= numericCondition;
+                default: return false;
+            }
+        } else {
+            return value.toLowerCase().includes(condition.toLowerCase()); // Fallback for text-based filters
         }
     });
 
-    displayPage(1); // Refresh table with filtered data
-    hideFilterMenu(); // Close the filter menu
+    displayPage(1);
+    updatePagination(1);
+    hideFilterMenu();
 }
 
 // Clears the applied column filter and resets the table to show all data

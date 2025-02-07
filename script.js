@@ -32,14 +32,13 @@ async function loadCSV(filename = "ratings_overall.csv", preservePage = false) {
     let lastPage = preservePage ? currentPage : 1;
 
     try {
-        // console.log(`Fetching: ${filename}`);
-
         const response = await fetch(`https://raw.githubusercontent.com/ausberg/tta_ratings/main/ratings/${filename}`);
         if (!response.ok) throw new Error(`Failed to load ${filename}, status: ${response.status}`);
 
         const data = await response.text();
+
         allRows = data.trim().split("\n").slice(1).map(row => {
-            let columns = row.split(/,|;/);
+            let columns = row.split(/,|;/).map(value => isNaN(value) ? value : parseFloat(value)); // Convert numbers correctly
         
             // Remove unwanted columns by their index positions (e.g., RD Δ, Opps Δ, W% Δ)
             let selectedColumns = [
@@ -62,19 +61,25 @@ async function loadCSV(filename = "ratings_overall.csv", preservePage = false) {
         
             return selectedColumns;
         }).filter(columns => columns.length === 15);
-        
-        // console.log("Rows loaded:", allRows.length);
+
+        // Reset sorting state when loading a new dataset
+        sortDirection = {};
+        filteredRows = [];
+
+        // Ensure sorting applies correctly when dataset loads
+        addSorting();
         displayPage(lastPage);
 
         setTimeout(() => {
             searchInput.value = previousSearch;
             searchTable();
         }, 300);
+
     } catch (error) {
         console.error("Error loading CSV:", error);
     }
+
     setupFilterButtons();
-    addSorting();
 }
 
 // Ensure the highlight formatting applies correctly
@@ -125,17 +130,29 @@ fetchLastCommitDate();
 function addSorting() {
     document.querySelectorAll("th").forEach((th, index) => {
         th.addEventListener("click", function (event) {
-            if (event.target.classList.contains("filter-btn")) return;
+            if (event.target.classList.contains("filter-btn")) return; // Ignore filter button clicks
 
+            // Toggle sorting direction (default is ascending)
             sortDirection[index] = sortDirection[index] ? -sortDirection[index] : 1;
-            let dataToSort = filteredRows.length > 0 ? filteredRows : allRows;
+
+            let dataToSort = filteredRows.length > 0 ? [...filteredRows] : [...allRows]; // Work on a copy
 
             dataToSort.sort((a, b) => {
-                let valA = isNaN(a[index]) ? a[index] : parseFloat(a[index]);
-                let valB = isNaN(b[index]) ? b[index] : parseFloat(b[index]);
-                return sortDirection[index] * (valA > valB ? 1 : valA < valB ? -1 : 0);
+                let valA = a[index], valB = b[index];
+
+                // Convert numeric columns to numbers for sorting
+                valA = isNaN(valA) ? null : parseFloat(valA);
+                valB = isNaN(valB) ? null : parseFloat(valB);
+
+                // Move NaNs to the bottom
+                if (valA === null && valB !== null) return 1;
+                if (valB === null && valA !== null) return -1;
+                if (valA === null && valB === null) return 0;
+
+                return sortDirection[index] * ((valA > valB) ? 1 : (valA < valB) ? -1 : 0);
             });
 
+            filteredRows = [...dataToSort]; // Ensure it updates properly
             displayPage(1);
         });
     });
@@ -449,7 +466,7 @@ function searchTable() {
 
     // Filter rows where the Player column (index 2) contains any of the search terms
     filteredRows = allRows.filter(row => 
-        searchNames.some(name => row[2].toLowerCase().includes(name))
+        typeof row[2] === 'string' && searchNames.some(name => row[2].toLowerCase().includes(name))
     );
 
     if (filteredRows.length === 0) {

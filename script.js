@@ -133,7 +133,7 @@ function addSorting() {
             if (event.target.classList.contains("filter-btn")) return; // Ignore filter button clicks
 
             // Toggle sorting direction (default is ascending)
-            sortDirection[index] = sortDirection[index] ? -sortDirection[index] : 1;
+            sortDirection[index] = sortDirection[index] ? -sortDirection[index] : -1;
 
             let dataToSort = filteredRows.length > 0 ? [...filteredRows] : [...allRows]; // Work on a copy
 

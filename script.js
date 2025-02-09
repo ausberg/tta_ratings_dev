@@ -649,4 +649,3 @@ window.onload = async function() {
 
     fetchLastCommitDate(); // Ensure last updated date is fetched
 };
-// test

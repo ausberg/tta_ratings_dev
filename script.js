@@ -408,6 +408,7 @@ function updatePagination(page) {
     }
 }
 
+let lastDownloadTime = 0;
 // Exports the selected CSV file for download
 function exportCSV() {
     if (!currentDataset) {
@@ -415,40 +416,59 @@ function exportCSV() {
         return;
     }
 
+    // Enforce rate limit: At most 1 download every 30 seconds
+    let now = Date.now();
+    if (now - lastDownloadTime < 30000) { // 30 seconds in milliseconds
+        alert("You're downloading too fast! Please wait a few seconds before trying again.");
+        return;
+    }
+    lastDownloadTime = now; 
+
     let csvURL = `https://raw.githubusercontent.com/ausberg/tta_ratings/main/ratings/${currentDataset}`;
 
     fetch(csvURL)
-        .then(response => response.blob()) // Convert response to a Blob object
+        .then(response => response.blob()) // Convert response to Blob
         .then(blob => {
             let link = document.createElement("a");
             link.href = window.URL.createObjectURL(blob);
-            link.download = currentDataset; // Uses the correct dataset filename
+            link.download = currentDataset; 
             document.body.appendChild(link);
-            link.click(); 
+            link.click();
             document.body.removeChild(link);
         })
         .catch(error => console.error("Error downloading CSV:", error));
 }
 
+let lastAllDownloadTime = 0;
 function exportAllCSV() {
     const filenames = ["ratings_overall.csv", "ratings_2p.csv", "ratings_3p.csv", "ratings_4p.csv"];
 
-    filenames.forEach(filename => {
-        let csvURL = `https://raw.githubusercontent.com/ausberg/tta_ratings/main/ratings/${filename}`;
+    // Enforce rate limit: At most one "Export All" download every 30 seconds
+    let now = Date.now();
+    if (now - lastAllDownloadTime < 30000) { // 30 seconds in milliseconds
+        alert("You're downloading too fast! Please wait a few seconds before trying again.");
+        return;
+    }
+    lastAllDownloadTime = now;
 
-        fetch(csvURL)
-            .then(response => response.blob()) // Convert response to Blob
-            .then(blob => {
-                let link = document.createElement("a");
-                link.href = window.URL.createObjectURL(blob);
-                link.download = filename;
-                document.body.appendChild(link);
-                link.click(); // Trigger download
-                document.body.removeChild(link);
-            })
-            .catch(error => console.error(`Error downloading ${filename}:`, error));
+    filenames.forEach((filename, index) => {
+        setTimeout(() => {
+            let csvURL = `https://raw.githubusercontent.com/ausberg/tta_ratings/main/ratings/${filename}`;
+
+            fetch(csvURL)
+                .then(response => response.blob()) // Convert response to Blob
+                .then(blob => {
+                    let link = document.createElement("a");
+                    link.href = window.URL.createObjectURL(blob);
+                    link.download = filename;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                })
+                .catch(error => console.error(`Error downloading ${filename}:`, error));
+        }, index * 2000); // Stagger downloads every 2 seconds to avoid triggering Cloudflare/GitHub limits
     });
-}
+}        
 
 // Searches the table for rows that match the input query
 function searchTable() {
@@ -629,3 +649,4 @@ window.onload = async function() {
 
     fetchLastCommitDate(); // Ensure last updated date is fetched
 };
+// test

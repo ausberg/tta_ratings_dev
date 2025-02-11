@@ -64,7 +64,7 @@
                     <th title="The player's position in the leaderboard based on Conservative Rating.&#10;- Denotes inactive players">
                         Rank <button class="filter-btn" data-index="0">≡</button>
                     </th>                    
-                    <th title="Change in rank since pajada's last publication.">
+                    <th title="Change in rank since the start of the rating period.">
                         Rank Δ <button class="filter-btn" data-index="1">≡</button>
                     </th>
                     <th title="The player's name.">
@@ -73,7 +73,7 @@
                     <th title="Conservative Rating = Rating - (3 * RD), ensuring more stability.">
                         Cons. Rating <button class="filter-btn" data-index="3">≡</button>
                     </th>
-                    <th title="Change in Conservative Rating since pajada's last publication.">
+                    <th title="Change in Conservative Rating since the start of the rating period.">
                         Cons. Δ <button class="filter-btn" data-index="4">≡</button>
                     </th>
                     <th title="The player's estimated skill level based on recent results.">
@@ -88,13 +88,13 @@
                     <th title="Total number of games won.">
                         Ws <button class="filter-btn" data-index="8">≡</button>
                     </th>
-                    <th title="Change in the number of wins since pajada's last publication.">
+                    <th title="Change in the number of wins since the start of the rating period.">
                         Ws Δ <button class="filter-btn" data-index="9">≡</button>
                     </th>
                     <th title="Total number of games lost.">
                         Ls <button class="filter-btn" data-index="10">≡</button>
                     </th>
-                    <th title="Change in the number of losses since pajada's last publication.">
+                    <th title="Change in the number of losses since the start of the rating period.">
                         Ls Δ <button class="filter-btn" data-index="11">≡</button>
                     </th>
                     <th title="Total number of games drawn.">
@@ -103,13 +103,9 @@
                     <th title="Win percentage = (Wins / (Wins + Losses + Draws)) * 100.">
                         W% <button class="filter-btn" data-index="13">≡</button>
                     </th>
-                    <th title="Change in win percentage since pajada's last publication.">
+                    <th title="Change in win percentage since the start of the rating period.">
                         W% Δ <button class="filter-btn" data-index="14">≡</button>
                     </th>                    
-                    <!-- <th title="Change in rating since pajada's last publication.">Rating Δ <button class="filter-btn" data-index="6">≡</button></th> -->
-                    <!-- <th title="Change in Rating Deviation (RD) since pajada's last publication.">RD Δ <button class="filter-btn" data-index="8">≡</button></th> -->
-                    <!-- <th title="Change in the number of unique opponents since pajada's last publication.">Opps Δ <button class="filter-btn" data-index="14">≡</button></th> -->
-                    <!-- <th title="Change in the number of draws since pajada's last publication.">Ds Δ <button class="filter-btn" data-index="17">≡</button></th> -->
                 </tr>
                 <tbody id="ratings-table-body"></tbody>
             </table>
@@ -157,6 +153,7 @@
                     <option value="50">50</option>
                     <option value="75">75</option>
                     <option value="100">100</option>
+                    <option value="5000">5000</option>
                 </select>
             </div>
 

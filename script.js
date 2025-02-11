@@ -18,21 +18,6 @@ function calculateRowsPerPage() {
     return Math.max(10, Math.floor(availableHeight / rowHeight) - 4);
 }
 
-async function loadTournaments() {
-    try {
-        const response = await fetch('tournaments.json');
-        if (!response.ok) throw new Error(`Failed to load tournaments.json, status: ${response.status}`);
-        
-        const data = await response.json();
-        const list = document.getElementById('tournament-list');
-        if (list) {
-            list.innerHTML = data.tournaments.map(t => `<p>${t}</p>`).join('');
-        }
-    } catch (error) {
-        console.error('Error loading tournaments:', error);
-    }
-}
-
 async function loadCSV(filename = "ratings_overall.csv", preservePage = false) {
     if (!filename || filename === "null") {  // Prevent loading null dataset
         console.error("Error: Attempted to load an invalid dataset:", filename);
@@ -564,8 +549,6 @@ document.addEventListener("DOMContentLoaded", function () {
             element.addEventListener(event, handler);
         }
     }
-
-    loadTournaments(); // Fetch and load tournaments on page load
 
     const searchInput = document.getElementById("search");
     const jumpButton = document.getElementById("jumpToPlayerBtn");

@@ -32,7 +32,7 @@ async function loadCSV(filename = "ratings_overall.csv", preservePage = false) {
     let lastPage = preservePage ? currentPage : 1;
 
     try {
-        const response = await fetch(`https://raw.githubusercontent.com/ausberg/tta_ratings/main/ratings/${filename}`);
+        const response = await fetch(`https://raw.githubusercontent.com/ausberg/tta_ratings_dev/main/ratings/${filename}`);
         if (!response.ok) throw new Error(`Failed to load ${filename}, status: ${response.status}`);
 
         const data = await response.text();
@@ -108,7 +108,7 @@ function formatColumn(value, index) {
 
 async function fetchLastCommitDate() {
     try {
-        const response = await fetch("https://api.github.com/repos/ausberg/tta_ratings/commits/main");
+        const response = await fetch("https://api.github.com/repos/ausberg/tta_ratings_dev/commits/main");
         const data = await response.json();
         
         // Convert UTC date to local timezone
@@ -424,7 +424,7 @@ function exportCSV() {
     }
     lastDownloadTime = now; 
 
-    let csvURL = `https://raw.githubusercontent.com/ausberg/tta_ratings/main/ratings/${currentDataset}`;
+    let csvURL = `https://raw.githubusercontent.com/ausberg/tta_ratings_dev/main/ratings/${currentDataset}`;
 
     fetch(csvURL)
         .then(response => response.blob()) // Convert response to Blob
@@ -453,7 +453,7 @@ function exportAllCSV() {
 
     filenames.forEach((filename, index) => {
         setTimeout(() => {
-            let csvURL = `https://raw.githubusercontent.com/ausberg/tta_ratings/main/ratings/${filename}`;
+            let csvURL = `https://raw.githubusercontent.com/ausberg/tta_ratings_dev/main/ratings/${filename}`;
 
             fetch(csvURL)
                 .then(response => response.blob()) // Convert response to Blob

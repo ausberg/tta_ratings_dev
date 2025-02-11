@@ -33,10 +33,10 @@ This document provides definitions for each column in the ratings table to help 
 - The change in a player's Rating Deviation since the start of the rating period.
 
 ### **Opponents**
-- The total number of unique opponents the player has faced.
+- The total number of opponents the player has faced.
 
 ### **Opponents Δ**
-- The change in the number of unique opponents faced since the start of the rating period.
+- The change in the number of opponents faced since the start of the rating period.
 
 ### **Wins**
 - The total number of games the player has won.

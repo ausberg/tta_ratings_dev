@@ -30,6 +30,7 @@ async function loadCSV(filename = "ratings_overall.csv", preservePage = false) {
     const searchInput = document.getElementById("search");
     const previousSearch = searchInput.value.trim();
     let lastPage = preservePage ? currentPage : 1;
+    sortDirection = {}; // Reset sorting state
 
     try {
         const response = await fetch(`https://raw.githubusercontent.com/ausberg/tta_ratings_dev/main/ratings/${filename}`);
@@ -128,6 +129,10 @@ async function fetchLastCommitDate() {
 fetchLastCommitDate();
 
 function addSorting() {
+    document.querySelectorAll("th").forEach((th, index) => {
+        th.replaceWith(th.cloneNode(true)); // Removes existing event listeners
+    });
+
     document.querySelectorAll("th").forEach((th, index) => {
         th.addEventListener("click", function (event) {
             if (event.target.classList.contains("filter-btn")) return; // Ignore filter button clicks

@@ -15,7 +15,7 @@ function calculateRowsPerPage() {
     const rowHeight = 30; // Approximate row height in pixels
     const availableHeight = windowHeight - headerHeight;
 
-    return Math.max(10, Math.floor(availableHeight / rowHeight) - 4);
+    return Math.max(10, Math.floor(availableHeight / rowHeight) - 2);
 }
 
 async function loadCSV(filename = "ratings_overall.csv", preservePage = false) {

@@ -7,7 +7,7 @@ This document lists all the tournaments included in the ratings system.
 - **Duel Curve** from Season 2 up to Season 11
 - **Eiffel Tower** up to Season 2
 - **Intermezzo Championship** up to Season 19
-- **International Championship** up to Season 19
+- **International Championship** up to Season 28
 - **Mercurial Ladder** up to Round 20
 - **Nations League** from Season 2 up to Season 10
 - **Premier League** up to Season 4

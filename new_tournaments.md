@@ -4,7 +4,7 @@ The following tournaments have been fully completed since the beginning of the c
 
 ## Newly completed Tournaments
 
-- **International Championship** Season 19
+- **International Championship** Season 28
 - **Mercurial Ladder** Season 19
 - **Mercurial Ladder** Season 20
 - **Royal League** Season 2 Tiebreakers

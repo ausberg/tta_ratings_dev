@@ -19,7 +19,7 @@ This document lists all the tournaments included in the ratings system.
 - **World Championship 2022**
 - **World Championship 2023**
 - **World Championship 2024**
-- **World Championship 2025** up to Stage 1
+- **World Championship 2025** up to Stage 2
 
 ---
 

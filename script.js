@@ -732,14 +732,6 @@ document.addEventListener("DOMContentLoaded", function () {
     // Search input event listener
     if (searchInput) {
         searchInput.addEventListener("input", function () {
-            let query = searchInput.value.trim();
-            let nameList = query.split(",").map(name => name.trim()).filter(name => name !== "");
-
-            if (nameList.length > 25) {
-                alert("You can only enter up to 25 names.");
-                searchInput.value = nameList.slice(0, 25).join(", ");
-            }
-
             searchTable(); // Ensure table filters properly
         });
     }

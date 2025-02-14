@@ -5,6 +5,9 @@ let sortDirection = {};
 let filteredRows = [];
 let rowsPerPage = calculateRowsPerPage();
 let currentDataset = null; // Track the currently loaded dataset
+let activeFilters = {}; // Store column filters persistently
+let activeFilterColumn = null; // Track which column is being filtered
+let searchQuery = "";  // Store the search term
 
 function calculateRowsPerPage() {
     const tableContainer = document.querySelector(".table-container");
@@ -19,6 +22,7 @@ function calculateRowsPerPage() {
 }
 
 async function loadCSV(filename = "ratings_overall.csv", preservePage = false) {
+
     if (!filename || filename === "null") {  // Prevent loading null dataset
         console.error("Error: Attempted to load an invalid dataset:", filename);
         return;
@@ -72,9 +76,10 @@ async function loadCSV(filename = "ratings_overall.csv", preservePage = false) {
         displayPage(lastPage);
 
         setTimeout(() => {
-            searchInput.value = previousSearch;
-            searchTable();
-        }, 300);
+            searchInput.value = searchQuery; // Restore previous search term
+            applyStoredFilters(); // Ensure column filters are applied first
+            applySearchFilter(); // Apply search on top of filtered data
+        }, 500);                         
 
     } catch (error) {
         console.error("Error loading CSV:", error);
@@ -189,7 +194,7 @@ function handleFilterClick(event) {
 }
 
 function showFilterMenu(index, button) {
-    activeFilterColumn = index;
+    activeFilterColumn = index; // Store the active column being filtered
 
     const filterMenu = document.getElementById("filter-menu");
     const filterTitle = document.getElementById("filter-title");
@@ -200,7 +205,8 @@ function showFilterMenu(index, button) {
     filterMenu.style.left = `${rect.left + window.scrollX}px`;
     filterMenu.style.top = `${rect.bottom + window.scrollY + 5}px`;
 
-    document.getElementById("filter-input").value = ""; // Clear previous input
+    // Restore previous filter value for this column (if any)
+    document.getElementById("filter-input").value = activeFilters[index] || "";
 }
 
 // Hides the filter menu when a filter is applied or dismissed
@@ -211,7 +217,9 @@ function hideFilterMenu() {
 // Applies a column filter based on user input
 function applyColumnFilter() {
     let input = document.getElementById("filter-input").value.trim();
-    if (!input || activeFilterColumn === undefined) return;
+    if (!input || activeFilterColumn === null) return;
+
+    activeFilters[activeFilterColumn] = input; // Store filter value globally
 
     let operator = "=";
     let condition = input;
@@ -222,35 +230,172 @@ function applyColumnFilter() {
         condition = match[2].trim();
     }
 
+    // Apply all active filters
     filteredRows = allRows.filter(row => {
-        let value = row[activeFilterColumn];
-        let numericValue = parseFloat(value);
-        let numericCondition = parseFloat(condition);
+        return Object.entries(activeFilters).every(([colIndex, filterValue]) => {
+            let cellValue = row[parseInt(colIndex)];
+            let numericValue = parseFloat(cellValue);
+            let numericCondition = parseFloat(filterValue.trim());
 
-        if (!isNaN(numericValue) && !isNaN(numericCondition)) {
+            if (!isNaN(numericValue) && !isNaN(numericCondition)) {
+                switch (operator) {
+                    case "=": return numericValue == numericCondition;
+                    case ">": return numericValue > numericCondition;
+                    case "<": return numericValue < numericCondition;
+                    case ">=": return numericValue >= numericCondition;
+                    case "<=": return numericValue <= numericCondition;
+                    default: return false;
+                }
+            } else {
+                return cellValue.toLowerCase().includes(filterValue.toLowerCase()); // Fallback for text
+            }
+        });
+    });
+
+    applyAllFilters(); // Apply all filters together
+
+    displayPage(1);
+    updatePagination(1);
+    hideFilterMenu();
+
+    // Highlight the filter button for this column
+    let filterBtn = document.querySelector(`.filter-btn[data-index="${activeFilterColumn}"]`);
+    if (filterBtn) {
+        filterBtn.classList.add("active-filter");
+    }
+}
+
+function applyAllFilters() {
+    if (Object.keys(activeFilters).length === 0) {
+        filteredRows = [...allRows]; // Reset to all rows if no filters are active
+        return;
+    }
+
+    filteredRows = allRows.filter(row => {
+        return Object.entries(activeFilters).every(([colIndex, filterValue]) => {
+            let cellValue = row[parseInt(colIndex)];
+            let numericValue = parseFloat(cellValue);
+            let numericCondition = parseFloat(filterValue.replace(/[^0-9.-]/g, "")); // Extract numbers from filter
+
+            // Extract operator (e.g., "<= 150")
+            let operator = filterValue.match(/^(<=|>=|>|<|=)/);
+            operator = operator ? operator[0] : "=";
+
+            if (!isNaN(numericValue) && !isNaN(numericCondition)) {
+                switch (operator) {
+                    case "=": return numericValue == numericCondition;
+                    case ">": return numericValue > numericCondition;
+                    case "<": return numericValue < numericCondition;
+                    case ">=": return numericValue >= numericCondition;
+                    case "<=": return numericValue <= numericCondition;
+                    default: return false;
+                }
+            } else {
+                return cellValue.toLowerCase().includes(filterValue.toLowerCase()); // Text filtering fallback
+            }
+        });
+    });
+}
+
+// Function to reapply stored filters
+function applyStoredFilters() {
+    if (allRows.length === 0) {
+        console.warn("No data loaded yet, skipping filter application.");
+        return;
+    }
+
+    // Reset filter buttons
+    document.querySelectorAll(".filter-btn").forEach(btn => btn.classList.remove("active-filter"));
+
+    // Apply all filters at once
+    filteredRows = allRows.filter(row => {
+        return Object.entries(activeFilters).every(([colIndex, filterValue]) => {
+            let cellValue = row[parseInt(colIndex)];
+            let numericValue = parseFloat(cellValue);
+            let numericCondition = parseFloat(filterValue.trim());
+
+            if (!isNaN(numericValue) && !isNaN(numericCondition)) {
+                switch (filterValue.charAt(0)) {
+                    case "=": return numericValue == numericCondition;
+                    case ">": return numericValue > numericCondition;
+                    case "<": return numericValue < numericCondition;
+                    case ">=": return numericValue >= numericCondition;
+                    case "<=": return numericValue <= numericCondition;
+                    default: return false;
+                }
+            } else {
+                return cellValue.toLowerCase().includes(filterValue.toLowerCase());
+            }
+        });
+    });
+
+    applyAllFilters(); // Apply all filters together
+
+    displayPage(1);
+    updatePagination(1);
+
+    // Highlight all active filter buttons
+    document.querySelectorAll(".filter-btn").forEach(btn => btn.classList.remove("active-filter"));
+    Object.keys(activeFilters).forEach(columnIndex => {
+        let filterBtn = document.querySelector(`.filter-btn[data-index="${columnIndex}"]`);
+        if (filterBtn) {
+            filterBtn.classList.add("active-filter");
+        }
+    });
+}
+
+function applyStoredFilter(columnIndex, filterValue) {
+    if (!filterValue || allRows.length === 0) return;
+
+    let operator = "=";
+    let condition = filterValue.trim();
+
+    // Extract operator and number (e.g., "> 150" => ">", "150")
+    const match = condition.match(/^(<=|>=|>|<|=)\s*(.+)$/);
+    if (match) {
+        operator = match[1];
+        condition = match[2].trim();
+    }
+
+    let numericCondition = parseFloat(condition);
+    
+    let sourceData = filteredRows.length > 0 ? filteredRows : allRows;
+    filteredRows = sourceData.filter(row => {
+        let cellValue = parseFloat(row[columnIndex]);
+
+        if (!isNaN(cellValue) && !isNaN(numericCondition)) {
             switch (operator) {
-                case "=": return numericValue == numericCondition;
-                case ">": return numericValue > numericCondition;
-                case "<": return numericValue < numericCondition;
-                case ">=": return numericValue >= numericCondition;
-                case "<=": return numericValue <= numericCondition;
+                case "=": return cellValue == numericCondition;
+                case ">": return cellValue > numericCondition;
+                case "<": return cellValue < numericCondition;
+                case ">=": return cellValue >= numericCondition;
+                case "<=": return cellValue <= numericCondition;
                 default: return false;
             }
         } else {
-            return value.toLowerCase().includes(condition.toLowerCase()); // Fallback for text-based filters
+            return row[columnIndex].toString().toLowerCase().includes(condition.toLowerCase());
         }
     });
 
     displayPage(1);
     updatePagination(1);
-    hideFilterMenu();
 }
 
 // Clears the applied column filter and resets the table to show all data
 function clearColumnFilter() {
-    filteredRows = [];  // Reset the filtered dataset
-    displayPage(1);      // Reload the full table
-    hideFilterMenu();    // Close the filter menu
+    if (activeFilterColumn !== null) {
+        delete activeFilters[activeFilterColumn]; // Remove filter from stored filters
+
+        // Remove highlight from filter button
+        let filterBtn = document.querySelector(`.filter-btn[data-index="${activeFilterColumn}"]`);
+        if (filterBtn) {
+            filterBtn.classList.remove("active-filter");
+        }
+    }
+
+    applyAllFilters();  // Reapply remaining filters
+    displayPage(1);
+    hideFilterMenu();  
 }
 
 // Displays a specific page of data in the table
@@ -283,7 +428,6 @@ function displayPage(page) {
     document.getElementById("ratings-table-body").innerHTML = tableBody;
     updatePagination(page);
 
-    // console.log(`Displayed Page: ${page}, Highlighted Row Index: ${window.highlightRowIndex}`);
 }
 
 // Function to update rows per page dynamically
@@ -301,8 +445,6 @@ function jumpToPage() {
         alert("Invalid page number.");
         return;
     }
-
-    // console.log("Jumping to page:", targetPage);
 
     currentPage = targetPage;
     displayPage(currentPage);  // Ensure table updates after page jump
@@ -478,39 +620,36 @@ function exportAllCSV() {
 
 // Searches the table for rows that match the input query
 function searchTable() {
-    const query = document.getElementById("search").value.trim();
+    searchQuery = document.getElementById("search").value.trim(); // Store the search term
 
-    // If the search box is empty, reset to full table
-    if (!query) {
-        filteredRows = []; // Clear the filtered list
-        displayPage(1); // Restore full dataset
+    // If search is empty, reset to full table
+    if (!searchQuery) {
+        applyAllFilters();  // Ensure filters still apply
+        displayPage(1);
         return;
     }
 
-    // Split input by commas and trim spaces
-    let searchNames = query.split(",").map(name => name.trim().toLowerCase());
+    let searchNames = searchQuery.split(",").map(name => name.trim().toLowerCase());
 
     // Filter rows where the Player column (index 2) contains any of the search terms
-    filteredRows = allRows.filter(row => 
-        typeof row[2] === 'string' && searchNames.some(name => row[2].toLowerCase().includes(name))
+    filteredRows = allRows.filter(row =>
+        typeof row[2] === "string" && searchNames.some(name => row[2].toLowerCase().includes(name))
     );
 
-    if (filteredRows.length === 0) {
-        return;
-    }
-
-    displayFilteredResults(filteredRows);
+    displayPage(1);
 }
 
-// Display full rows of filtered results (not just player names)
-function displayFilteredResults(filteredRows) {
-    let tableBody = filteredRows.map(columns => `
-        <tr>
-            ${columns.map((col, index) => formatColumn(col, index)).join('')} 
-        </tr>
-    `).join('');
+function applySearchFilter() {
+    if (!searchQuery) return; // If no search term, do nothing
 
-    document.getElementById("ratings-table-body").innerHTML = tableBody;
+    let searchNames = searchQuery.split(",").map(name => name.trim().toLowerCase());
+
+    // Ensure search is applied AFTER column filters
+    filteredRows = (filteredRows.length > 0 ? filteredRows : allRows).filter(row =>
+        typeof row[2] === "string" && searchNames.some(name => row[2].toLowerCase().includes(name))
+    );
+
+    displayPage(1); // Refresh the table with filtered results
 }
 
 function jumpToPlayer() {
@@ -531,7 +670,6 @@ function jumpToPlayer() {
     }
 
     let pageNumber = Math.floor(foundIndex / rowsPerPage) + 1;
-    // console.log(`Jumping to Page: ${pageNumber} for player: ${query}`);
 
     // Preserve the highlight row index
     window.highlightRowIndex = foundIndex;

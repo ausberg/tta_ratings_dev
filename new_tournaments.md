@@ -8,6 +8,7 @@ The following tournaments have been fully completed since the beginning of the c
 - **Mercurial Ladder** Season 19
 - **Mercurial Ladder** Season 20
 - **Royal League** Season 2 Tiebreakers
+- **Slow Burn** Season 6
 - **Sodium Ladder** Season 2
 - **World Championship** 2025 Stage 1
 - **World Championship** 2025 Stage 2

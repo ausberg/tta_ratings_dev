@@ -10,6 +10,7 @@ The following tournaments have been fully completed since the beginning of the c
 - **Royal League** Season 2 Tiebreakers
 - **Sodium Ladder** Season 2
 - **World Championship** 2025 Stage 1
+- **World Championship** 2025 Stage 2
 
 ---
 

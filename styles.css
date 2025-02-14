@@ -117,6 +117,7 @@ tr:nth-child(odd) { background-color: #E6D2BA; }
     max-width: 100%;
     text-align: center;
     padding: 5px;
+    font-size: 11px;
 }
 
 /* ========================== */

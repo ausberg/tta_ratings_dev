@@ -597,9 +597,9 @@ document.addEventListener("DOMContentLoaded", function () {
             let query = searchInput.value.trim();
             let nameList = query.split(",").map(name => name.trim()).filter(name => name !== "");
 
-            if (nameList.length > 8) {
-                alert("You can only enter up to 8 names.");
-                searchInput.value = nameList.slice(0, 8).join(", ");
+            if (nameList.length > 25) {
+                alert("You can only enter up to 25 names.");
+                searchInput.value = nameList.slice(0, 25).join(", ");
             }
 
             searchTable(); // Ensure table filters properly

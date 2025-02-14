@@ -169,18 +169,17 @@ function addSorting() {
 }
 
 function setupFilterButtons() {
-    // Add a click event listener to the document
     document.addEventListener("click", function(event) {
+        const filterMenu = document.getElementById("filter-menu");
+
         // Check if the clicked element is a filter button
         if (event.target.classList.contains("filter-btn")) {
-            // Prevent the event from propagating further
-            event.stopPropagation();
-
-            // Get the index of the column to filter
+            event.stopPropagation(); // Prevent the document click event from firing
             const index = parseInt(event.target.getAttribute("data-index"));
-
-            // Show the filter menu for the selected column
             showFilterMenu(index, event.target);
+        } else if (!filterMenu.contains(event.target)) {
+            // If clicking outside the filter menu, close it
+            hideFilterMenu();
         }
     });
 }
@@ -206,7 +205,17 @@ function showFilterMenu(index, button) {
     filterMenu.style.top = `${rect.bottom + window.scrollY + 5}px`;
 
     // Restore previous filter value for this column (if any)
-    document.getElementById("filter-input").value = activeFilters[index] || "";
+    const filterInput = document.getElementById("filter-input");
+    filterInput.value = activeFilters[index] || "";
+    filterInput.focus();
+
+    // Allow pressing Enter to apply the filter
+    filterInput.addEventListener("keydown", function(event) {
+        if (event.key === "Enter") {
+            event.preventDefault(); // Prevent form submission (if applicable)
+            applyColumnFilter();
+        }
+    });
 }
 
 // Hides the filter menu when a filter is applied or dismissed

@@ -149,18 +149,23 @@ function addSorting() {
 
             dataToSort.sort((a, b) => {
                 let valA = a[index], valB = b[index];
-
+            
+                // Special case: Sorting "Player" column (index 2)
+                if (index === 2) {
+                    return sortDirection[index] * valA.toString().localeCompare(valB.toString(), undefined, { numeric: true, sensitivity: 'base' });
+                }
+            
                 // Convert numeric columns to numbers for sorting
                 valA = isNaN(valA) ? null : parseFloat(valA);
                 valB = isNaN(valB) ? null : parseFloat(valB);
-
+            
                 // Move NaNs to the bottom
                 if (valA === null && valB !== null) return 1;
                 if (valB === null && valA !== null) return -1;
                 if (valA === null && valB === null) return 0;
-
+            
                 return sortDirection[index] * ((valA > valB) ? 1 : (valA < valB) ? -1 : 0);
-            });
+            });                      
 
             filteredRows = [...dataToSort]; // Ensure it updates properly
             displayPage(1);

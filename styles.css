@@ -84,7 +84,7 @@ tr:nth-child(odd) { background-color: #E6D2BA; }
     max-width: 100%;
     margin-left: auto;
     margin-right: auto;
-    gap: 150px;
+    gap: 160px;
 }
 
 /* Ratings + Search group (Align Left) */
@@ -143,9 +143,9 @@ tr:nth-child(odd) { background-color: #E6D2BA; }
 
 /* Highlight the active button */
 .ctrl-btn.active-btn {
-    background-color: #1e7e34; /* Darker green */
+    background-color: #1e7e34;
     font-weight: bold;
-    border: 2px solid #155724; /* Add a subtle border */
+    border: 2px solid #155724;
 }
 
 /* Filter Buttons */
@@ -285,9 +285,9 @@ tr:nth-child(odd) { background-color: #E6D2BA; }
     }
 
     .filter-btn {
-        font-size: 15px; /* Increase text size */
-        padding: 5px 5px; /* Increase button size */
-        min-width: 5px; /* Ensure minimum button width */
+        font-size: 15px;
+        padding: 5px 5px;
+        min-width: 5px;
     }
 }
 
@@ -319,7 +319,7 @@ h2, p {
 
 /* Highlight active filter buttons */
 .filter-btn.active-filter {
-    background-color: #FFD700; /* Gold highlight */
+    background-color: #FFD700;
     font-weight: bold;
-    border: 2px solid #DAA520; /* Darker gold border */
+    border: 2px solid #DAA520;
 }

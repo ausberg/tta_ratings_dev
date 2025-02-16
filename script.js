@@ -484,42 +484,44 @@ function updatePagination(page) {
     let paginationDiv = document.querySelector(".pagination");
 
     // Clear existing pagination content
-    paginationDiv.innerHTML = "";  
+    paginationDiv.innerHTML = "";
+
+    // Set fixed button widths to prevent shifting
+    const buttonWidth = "50px"; // For number buttons
+    const navButtonWidth = "80px"; // For "Previous" and "Next" buttons
 
     // Create Previous button
     let prevBtn = document.createElement("button");
     prevBtn.textContent = "Previous";
+    prevBtn.style.width = navButtonWidth;
     prevBtn.disabled = page === 1;
     prevBtn.addEventListener("click", () => displayPage(page - 1));
     paginationDiv.appendChild(prevBtn);
 
-    // Generate page numbers dynamically
+    // Show up to 3 pages before current (only if valid)
     let startPage = Math.max(1, page - 3);
     let endPage = Math.min(totalPages, page + 3);
-
-    if (startPage > 1) {
-        let firstPageBtn = document.createElement("button");
-        firstPageBtn.textContent = "1";
-        firstPageBtn.addEventListener("click", () => displayPage(1));
-        paginationDiv.appendChild(firstPageBtn);
-        if (startPage > 2) paginationDiv.appendChild(document.createTextNode(" ... "));
-    }
 
     for (let i = startPage; i <= endPage; i++) {
         let pageBtn = document.createElement("button");
         pageBtn.textContent = i;
-        if (i === page) pageBtn.style.fontWeight = "bold";
-        pageBtn.addEventListener("click", () => displayPage(i));
+        pageBtn.style.width = buttonWidth;
+        if (i === page) {
+            pageBtn.style.fontWeight = "bold";
+            pageBtn.disabled = true;
+        } else {
+            pageBtn.addEventListener("click", () => displayPage(i));
+        }
         paginationDiv.appendChild(pageBtn);
     }
 
-    if (endPage < totalPages) {
-        if (endPage < totalPages - 1) paginationDiv.appendChild(document.createTextNode(" ... "));
-        let lastPageBtn = document.createElement("button");
-        lastPageBtn.textContent = totalPages;
-        lastPageBtn.addEventListener("click", () => displayPage(totalPages));
-        paginationDiv.appendChild(lastPageBtn);
-    }
+    // Create Next button
+    let nextBtn = document.createElement("button");
+    nextBtn.textContent = "Next";
+    nextBtn.style.width = navButtonWidth;
+    nextBtn.disabled = page === totalPages;
+    nextBtn.addEventListener("click", () => displayPage(page + 1));
+    paginationDiv.appendChild(nextBtn);
 
     // Jump-to-Page input
     let pageInput = document.createElement("input");
@@ -535,18 +537,11 @@ function updatePagination(page) {
     // "Go" button
     let goBtn = document.createElement("button");
     goBtn.textContent = "Go";
+    goBtn.style.width = buttonWidth;
     goBtn.addEventListener("click", jumpToPage);
     paginationDiv.appendChild(goBtn);
 
-    // Next button
-    let nextBtn = document.createElement("button");
-    nextBtn.id = "nextPageBtn";
-    nextBtn.textContent = "Next";
-    nextBtn.disabled = page === totalPages;
-    nextBtn.addEventListener("click", () => displayPage(page + 1));
-    paginationDiv.appendChild(nextBtn);
-
-    // **Ensure rows-per-page dropdown is created only once**
+    // Ensure rows-per-page dropdown is created only once
     let selectElement = document.getElementById("rowsPerPageSelect");
 
     if (!selectElement) {
@@ -569,7 +564,7 @@ function updatePagination(page) {
         selectElement.addEventListener("change", updateRowsPerPage);
     }
 
-    // **Ensure the dropdown reflects the actual selected value**
+    // Ensure the dropdown reflects the actual selected value
     selectElement.value = autoRowsInitialized ? "auto" : rowsPerPage.toString();
 }
 

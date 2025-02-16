@@ -286,21 +286,29 @@ function applyAllFilters() {
         return Object.entries(activeFilters).every(([colIndex, filterValue]) => {
             let cellValue = row[parseInt(colIndex)].toString().toLowerCase().trim();
 
-            // Extract numeric value
+            // Extract numeric value (if applicable)
             let numericValue = parseFloat(cellValue);
             let numericCondition = parseFloat(filterValue.replace(/[^0-9.-]/g, "")); // Extract numbers
 
-            // Extract operator (e.g., "<= 150" or "=new")
-            let operatorMatch = filterValue.match(/^(<=|>=|>|<|=)/);
+            // Extract operator (including `!=`)
+            let operatorMatch = filterValue.match(/^(<=|>=|>|<|=|!=)/);
             let operator = operatorMatch ? operatorMatch[0] : "=";
-            let condition = filterValue.replace(/^(<=|>=|>|<|=)\s*/, "").toLowerCase(); // Remove operator from input
+            let condition = filterValue.replace(/^(<=|>=|>|<|=|!=)\s*/, "").toLowerCase(); // Remove operator from input
 
-            // **Modified String-based Filtering**
-            if (isNaN(numericValue)) { // If not a number, treat as string
-                if (operator === "=") {
-                    return cellValue === condition; // Exact match for strings
+            // **Handle `!=` (not equal) for BOTH text and numeric values**
+            if (operator === "!=") {
+                if (!isNaN(numericValue) && !isNaN(numericCondition)) {
+                    return numericValue !== numericCondition; // Numeric comparison
                 }
-                return cellValue.includes(condition); // Default substring match
+                return cellValue !== condition; // String comparison
+            }
+
+            // **String-based Filtering**
+            if (isNaN(numericValue)) { // If not a number, treat as string
+                switch (operator) {
+                    case "=": return cellValue === condition;
+                    default: return cellValue.includes(condition); // Default substring match
+                }
             }
 
             // **Numeric-based Filtering**

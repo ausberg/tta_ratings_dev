@@ -8,6 +8,7 @@ let currentDataset = null; // Track the currently loaded dataset
 let activeFilters = {}; // Store column filters persistently
 let activeFilterColumn = null; // Track which column is being filtered
 let searchQuery = "";  // Store the search term
+let autoRowsSet = false; // Track if Auto rows have been set already
 
 function calculateRowsPerPage() {
     const tableContainer = document.querySelector(".table-container");
@@ -444,7 +445,14 @@ function displayPage(page) {
 // Function to update rows per page dynamically
 function updateRowsPerPage() {
     let selectedValue = document.getElementById("rowsPerPageSelect").value;
-    rowsPerPage = selectedValue === "auto" ? calculateRowsPerPage() : parseInt(selectedValue, 10);
+    if (selectedValue === "auto") {
+        if (!autoRowsSet) {
+            rowsPerPage = calculateRowsPerPage();
+            autoRowsSet = true;
+        }
+    } else {
+        rowsPerPage = parseInt(selectedValue, 10);
+    }
     displayPage(1); // Reload table with new row count
 }
 
@@ -710,6 +718,13 @@ document.addEventListener("DOMContentLoaded", function () {
     let currentDataset = null; // Track the currently loaded dataset
     let activeButton = document.getElementById("overallRatingsBtn"); // Default active button
 
+    document.getElementById("rowsPerPageSelect").addEventListener("change", function () {
+        if (this.value === "auto") {
+            autoRowsSet = false; // Allow recalculation on next selection
+        }
+        updateRowsPerPage();
+    });
+
     // Prevent duplicate dataset loading
     document.querySelectorAll(".ctrl-btn").forEach(button => {
         button.addEventListener("click", function () {
@@ -786,13 +801,8 @@ document.addEventListener("DOMContentLoaded", function () {
 // Load the table on page load
 window.onload = async function() {
     rowsPerPage = calculateRowsPerPage();
+    autoRowsSet = true; // Set once at page load
     await loadCSV();
-
-    // Update on window resize
-    window.addEventListener("resize", () => {
-        rowsPerPage = calculateRowsPerPage();
-        displayPage(currentPage);
-    });
 
     fetchLastCommitDate(); // Ensure last updated date is fetched
 };

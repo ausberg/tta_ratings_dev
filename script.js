@@ -616,9 +616,10 @@ function exportAllCSV() {
 // Searches the table for rows that match the input query
 function searchTable() {
     searchQuery = document.getElementById("search").value.trim(); // Store the search term
+    // console.log("Search Query:", searchQuery);
 
-    // If search is empty, reset to full table
     if (!searchQuery) {
+        console.log("Empty search, resetting filters.");
         applyAllFilters();  // Ensure filters still apply
         displayPage(1);
         return;
@@ -626,11 +627,11 @@ function searchTable() {
 
     let searchNames = searchQuery.split(",").map(name => name.trim().toLowerCase());
 
-    // Filter rows where the Player column (index 2) contains any of the search terms
     filteredRows = allRows.filter(row =>
         typeof row[2] === "string" && searchNames.some(name => row[2].toLowerCase().includes(name))
     );
 
+    // console.log("Filtered Rows:", filteredRows.length);
     displayPage(1);
 }
 
@@ -694,18 +695,11 @@ document.addEventListener("DOMContentLoaded", function () {
     let currentDataset = null; // Track the currently loaded dataset
     let activeButton = document.getElementById("overallRatingsBtn"); // Default active button
 
-    document.getElementById("rowsPerPageSelect").addEventListener("change", function () {
-        if (this.value === "auto") {
-            autoRowsSet = false; // Allow recalculation on next selection
-        }
-        updateRowsPerPage();
-    });
-
     // Prevent duplicate dataset loading
     document.querySelectorAll(".ctrl-btn").forEach(button => {
         button.addEventListener("click", function () {
             const filename = this.getAttribute("data-filename");
-    
+
             // Ensure only dataset-switching buttons trigger loadCSV
             if (!filename) {
                 if (this.id !== "jumpToPlayerBtn") { // Allow "Show Player Page" button to function normally
@@ -713,11 +707,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
                 return;
             }
-    
+
             if (currentDataset !== filename) {  
                 currentDataset = filename;
                 loadCSV(filename, true); // Preserve the current page
-    
+
                 // Mark the clicked button as active
                 setActiveButton(this);
             }

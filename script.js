@@ -486,19 +486,10 @@ function updatePagination(page) {
     // Clear existing pagination content
     paginationDiv.innerHTML = "";
 
-    // Set fixed button widths to prevent shifting
-    const buttonWidth = "50px"; // For number buttons
-    const navButtonWidth = "80px"; // For "Previous" and "Next" buttons
+    // Set fixed button width for consistency
+    const buttonWidth = "50px";
 
-    // Create Previous button
-    let prevBtn = document.createElement("button");
-    prevBtn.textContent = "Previous";
-    prevBtn.style.width = navButtonWidth;
-    prevBtn.disabled = page === 1;
-    prevBtn.addEventListener("click", () => displayPage(page - 1));
-    paginationDiv.appendChild(prevBtn);
-
-    // Show up to 3 pages before current (only if valid)
+    // Show up to 3 pages before current (if valid)
     let startPage = Math.max(1, page - 3);
     let endPage = Math.min(totalPages, page + 3);
 
@@ -514,14 +505,6 @@ function updatePagination(page) {
         }
         paginationDiv.appendChild(pageBtn);
     }
-
-    // Create Next button
-    let nextBtn = document.createElement("button");
-    nextBtn.textContent = "Next";
-    nextBtn.style.width = navButtonWidth;
-    nextBtn.disabled = page === totalPages;
-    nextBtn.addEventListener("click", () => displayPage(page + 1));
-    paginationDiv.appendChild(nextBtn);
 
     // Jump-to-Page input
     let pageInput = document.createElement("input");

@@ -251,7 +251,9 @@ function applyColumnFilter() {
             let numericValue = parseFloat(cellValue);
             let numericCondition = parseFloat(filterValue.trim());
 
-            if (!isNaN(numericValue) && !isNaN(numericCondition)) {
+            if (typeof cellValue === "string") {
+                return cellValue.toLowerCase().includes(filterValue.toLowerCase());
+            } else if (!isNaN(numericValue) && !isNaN(numericCondition)) {
                 switch (operator) {
                     case "=": return numericValue == numericCondition;
                     case ">": return numericValue > numericCondition;
@@ -261,8 +263,8 @@ function applyColumnFilter() {
                     default: return false;
                 }
             } else {
-                return cellValue.toLowerCase().includes(filterValue.toLowerCase()); // Fallback for text
-            }
+                return false;
+            }                       
         });
     });
 
@@ -295,7 +297,9 @@ function applyAllFilters() {
             let operator = filterValue.match(/^(<=|>=|>|<|=)/);
             operator = operator ? operator[0] : "=";
 
-            if (!isNaN(numericValue) && !isNaN(numericCondition)) {
+            if (typeof cellValue === "string") {
+                return cellValue.toLowerCase().includes(filterValue.toLowerCase());
+            } else if (!isNaN(numericValue) && !isNaN(numericCondition)) {
                 switch (operator) {
                     case "=": return numericValue == numericCondition;
                     case ">": return numericValue > numericCondition;
@@ -305,8 +309,8 @@ function applyAllFilters() {
                     default: return false;
                 }
             } else {
-                return cellValue.toLowerCase().includes(filterValue.toLowerCase()); // Text filtering fallback
-            }
+                return false;
+            }                       
         });
     });
 }
@@ -328,8 +332,10 @@ function applyStoredFilters() {
             let numericValue = parseFloat(cellValue);
             let numericCondition = parseFloat(filterValue.trim());
 
-            if (!isNaN(numericValue) && !isNaN(numericCondition)) {
-                switch (filterValue.charAt(0)) {
+            if (typeof cellValue === "string") {
+                return cellValue.toLowerCase().includes(filterValue.toLowerCase());
+            } else if (!isNaN(numericValue) && !isNaN(numericCondition)) {
+                switch (operator) {
                     case "=": return numericValue == numericCondition;
                     case ">": return numericValue > numericCondition;
                     case "<": return numericValue < numericCondition;
@@ -338,8 +344,8 @@ function applyStoredFilters() {
                     default: return false;
                 }
             } else {
-                return cellValue.toLowerCase().includes(filterValue.toLowerCase());
-            }
+                return false;
+            }                     
         });
     });
 

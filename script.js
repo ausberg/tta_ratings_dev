@@ -489,9 +489,14 @@ function updatePagination(page) {
     // Set fixed button width for consistency
     const buttonWidth = "50px";
 
-    // Show up to 3 pages before current (if valid)
+    // Ensure exactly 3 pages are shown at any time
     let startPage = Math.max(1, page - 1);
-    let endPage = Math.min(totalPages, page + 1);
+    let endPage = Math.min(totalPages, startPage + 2);
+
+    // Adjust for edge cases
+    if (endPage - startPage < 2) {
+        startPage = Math.max(1, endPage - 2);
+    }
 
     // First Button
     let firstBtn = document.createElement("button");

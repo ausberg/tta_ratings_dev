@@ -14,7 +14,7 @@ This document lists all the tournaments included in the ratings system.
 - **Royal League** up to Season 2
 - **Slow Burn** up to Season 6
 - **Sodium Ladder** up to Season 2
-- **Transcontinental Ladder** up to Round 118
+- **Transcontinental Ladder** up to Round 119
 - **Wimbledon 2023**
 - **World Championship 2022**
 - **World Championship 2023**

@@ -9,6 +9,7 @@ let activeFilters = {}; // Store column filters persistently
 let activeFilterColumn = null; // Track which column is being filtered
 let searchQuery = "";  // Store the search term
 let autoRowsSet = false; // Track if Auto rows have been set already
+let manualRowsSet = false; // Track if the user manually selected rows
 
 function calculateRowsPerPage() {
     const tableContainer = document.querySelector(".table-container");
@@ -443,18 +444,24 @@ function displayPage(page) {
 }
 
 // Function to update rows per page dynamically
+
 function updateRowsPerPage() {
     let selectedValue = document.getElementById("rowsPerPageSelect").value;
+
     if (selectedValue === "auto") {
-        if (!autoRowsSet) {
-            rowsPerPage = calculateRowsPerPage();
+        if (!manualRowsSet) { 
+            rowsPerPage = calculateRowsPerPage(); // Only recalculate if manually selecting 'Auto'
             autoRowsSet = true;
         }
     } else {
         rowsPerPage = parseInt(selectedValue, 10);
+        manualRowsSet = true; // Ensure it sticks
+        autoRowsSet = false; // Disable auto adjustment if manually set
     }
+
     displayPage(1); // Reload table with new row count
 }
+
 
 function jumpToPage() {
     let pageInput = document.getElementById("pageJumpInput").value.trim();

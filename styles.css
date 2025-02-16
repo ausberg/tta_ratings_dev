@@ -285,8 +285,8 @@ tr:nth-child(odd) { background-color: #E6D2BA; }
     }
 
     .filter-btn {
-        font-size: 16px; /* Increase text size */
-        padding: 10px 15px; /* Increase button size */
+        font-size: 20px; /* Increase text size */
+        padding: 15px 20px; /* Increase button size */
         min-width: 80px; /* Ensure minimum button width */
     }
 }

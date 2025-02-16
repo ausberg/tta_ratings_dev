@@ -197,6 +197,30 @@ function handleFilterClick(event) {
     showFilterMenu(index, event.target);
 }
 
+function setupFilterInput() {
+    const filterInput = document.getElementById("filter-input");
+
+    // Remove any existing event listener (if any) before adding a new one
+    filterInput.removeEventListener("keydown", handleFilterEnter);
+    filterInput.addEventListener("keydown", handleFilterEnter);
+}
+
+// Global function to handle Enter key press for filtering
+function handleFilterEnter(event) {
+    if (event.key === "Enter") {
+        event.preventDefault();
+
+        const filterInput = document.getElementById("filter-input");
+
+        // Force re-focus on input before applying the filter
+        filterInput.focus();
+        filterInput.blur(); // Remove any autocomplete suggestions
+        filterInput.focus();
+
+        applyColumnFilter();
+    }
+}
+
 function showFilterMenu(index, button) {
     activeFilterColumn = index; // Store the active column being filtered
 
@@ -214,13 +238,8 @@ function showFilterMenu(index, button) {
     filterInput.value = activeFilters[index] || "";
     filterInput.focus();
 
-    // Allow pressing Enter to apply the filter
-    filterInput.addEventListener("keydown", function(event) {
-        if (event.key === "Enter") {
-            event.preventDefault(); // Prevent form submission (if applicable)
-            applyColumnFilter();
-        }
-    });
+    // Ensure the filter input has the correct event listener
+    setupFilterInput();
 }
 
 // Hides the filter menu when a filter is applied or dismissed
@@ -233,48 +252,24 @@ function applyColumnFilter() {
     let input = document.getElementById("filter-input").value.trim();
     if (!input || activeFilterColumn === null) return;
 
-    activeFilters[activeFilterColumn] = input; // Store filter value globally
+    // Extract operator (if present) and numeric part
+    let operatorMatch = input.match(/^(<=|>=|>|<|=)/);
+    let operator = operatorMatch ? operatorMatch[0] : "=";
+    let condition = input.replace(/^(<=|>=|>|<|=)\s*/, ""); // Extract numeric part
 
-    let operator = "=";
-    let condition = input;
+    // Ensure condition is handled correctly
+    let numericCondition = parseFloat(condition);
 
-    const match = input.match(/^(<=|>=|>|<|=)\s*(.+)$/);
-    if (match) {
-        operator = match[1];
-        condition = match[2].trim();
-    }
+    // Store **full** filter value (including operator) for this column
+    activeFilters[activeFilterColumn] = input; // Example: ">200"
 
-    // Apply all active filters
-    filteredRows = allRows.filter(row => {
-        return Object.entries(activeFilters).every(([colIndex, filterValue]) => {
-            let cellValue = row[parseInt(colIndex)];
-            let numericValue = parseFloat(cellValue);
-            let numericCondition = parseFloat(filterValue.trim());
-
-            if (typeof cellValue === "string") {
-                return cellValue.toLowerCase().includes(filterValue.toLowerCase());
-            } else if (!isNaN(numericValue) && !isNaN(numericCondition)) {
-                switch (operator) {
-                    case "=": return numericValue == numericCondition;
-                    case ">": return numericValue > numericCondition;
-                    case "<": return numericValue < numericCondition;
-                    case ">=": return numericValue >= numericCondition;
-                    case "<=": return numericValue <= numericCondition;
-                    default: return false;
-                }
-            } else {
-                return false;
-            }                       
-        });
-    });
-
-    applyAllFilters(); // Apply all filters together
+    applyAllFilters(); // Process filtering across all columns
 
     displayPage(1);
     updatePagination(1);
     hideFilterMenu();
 
-    // Highlight the filter button for this column
+    // Highlight active filter button
     let filterBtn = document.querySelector(`.filter-btn[data-index="${activeFilterColumn}"]`);
     if (filterBtn) {
         filterBtn.classList.add("active-filter");
@@ -283,36 +278,48 @@ function applyColumnFilter() {
 
 function applyAllFilters() {
     if (Object.keys(activeFilters).length === 0) {
-        filteredRows = [...allRows]; // Reset to all rows if no filters are active
+        filteredRows = [...allRows]; // Reset if no filters
         return;
     }
 
     filteredRows = allRows.filter(row => {
         return Object.entries(activeFilters).every(([colIndex, filterValue]) => {
-            let cellValue = row[parseInt(colIndex)];
+            let cellValue = row[parseInt(colIndex)].toString().toLowerCase().trim();
+
+            // Extract numeric value
             let numericValue = parseFloat(cellValue);
-            let numericCondition = parseFloat(filterValue.replace(/[^0-9.-]/g, "")); // Extract numbers from filter
+            let numericCondition = parseFloat(filterValue.replace(/[^0-9.-]/g, "")); // Extract numbers
 
-            // Extract operator (e.g., "<= 150")
-            let operator = filterValue.match(/^(<=|>=|>|<|=)/);
-            operator = operator ? operator[0] : "=";
+            // Extract operator (e.g., "<= 150" or "=new")
+            let operatorMatch = filterValue.match(/^(<=|>=|>|<|=)/);
+            let operator = operatorMatch ? operatorMatch[0] : "=";
+            let condition = filterValue.replace(/^(<=|>=|>|<|=)\s*/, "").toLowerCase(); // Remove operator from input
 
-            if (typeof cellValue === "string") {
-                return cellValue.toLowerCase().includes(filterValue.toLowerCase());
-            } else if (!isNaN(numericValue) && !isNaN(numericCondition)) {
+            // **Modified String-based Filtering**
+            if (isNaN(numericValue)) { // If not a number, treat as string
+                if (operator === "=") {
+                    return cellValue === condition; // Exact match for strings
+                }
+                return cellValue.includes(condition); // Default substring match
+            }
+
+            // **Numeric-based Filtering**
+            if (!isNaN(numericValue) && !isNaN(numericCondition)) {
                 switch (operator) {
-                    case "=": return numericValue == numericCondition;
+                    case "=": return numericValue === numericCondition;
                     case ">": return numericValue > numericCondition;
                     case "<": return numericValue < numericCondition;
                     case ">=": return numericValue >= numericCondition;
                     case "<=": return numericValue <= numericCondition;
                     default: return false;
                 }
-            } else {
-                return false;
-            }                       
+            }
+
+            return false;
         });
     });
+
+    displayPage(1);
 }
 
 // Function to reapply stored filters
@@ -325,37 +332,13 @@ function applyStoredFilters() {
     // Reset filter buttons
     document.querySelectorAll(".filter-btn").forEach(btn => btn.classList.remove("active-filter"));
 
-    // Apply all filters at once
-    filteredRows = allRows.filter(row => {
-        return Object.entries(activeFilters).every(([colIndex, filterValue]) => {
-            let cellValue = row[parseInt(colIndex)];
-            let numericValue = parseFloat(cellValue);
-            let numericCondition = parseFloat(filterValue.trim());
-
-            if (typeof cellValue === "string") {
-                return cellValue.toLowerCase().includes(filterValue.toLowerCase());
-            } else if (!isNaN(numericValue) && !isNaN(numericCondition)) {
-                switch (operator) {
-                    case "=": return numericValue == numericCondition;
-                    case ">": return numericValue > numericCondition;
-                    case "<": return numericValue < numericCondition;
-                    case ">=": return numericValue >= numericCondition;
-                    case "<=": return numericValue <= numericCondition;
-                    default: return false;
-                }
-            } else {
-                return false;
-            }                     
-        });
-    });
-
-    applyAllFilters(); // Apply all filters together
+    // Apply all active filters
+    applyAllFilters();
 
     displayPage(1);
     updatePagination(1);
 
     // Highlight all active filter buttons
-    document.querySelectorAll(".filter-btn").forEach(btn => btn.classList.remove("active-filter"));
     Object.keys(activeFilters).forEach(columnIndex => {
         let filterBtn = document.querySelector(`.filter-btn[data-index="${columnIndex}"]`);
         if (filterBtn) {

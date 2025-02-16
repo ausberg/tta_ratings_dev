@@ -490,8 +490,16 @@ function updatePagination(page) {
     const buttonWidth = "50px";
 
     // Show up to 3 pages before current (if valid)
-    let startPage = Math.max(1, page - 3);
-    let endPage = Math.min(totalPages, page + 3);
+    let startPage = Math.max(1, page - 1);
+    let endPage = Math.min(totalPages, page + 1);
+
+    // First Button
+    let firstBtn = document.createElement("button");
+    firstBtn.textContent = "First";
+    firstBtn.style.width = buttonWidth;
+    firstBtn.disabled = page === 1;
+    firstBtn.addEventListener("click", () => displayPage(1));
+    paginationDiv.appendChild(firstBtn);
 
     for (let i = startPage; i <= endPage; i++) {
         let pageBtn = document.createElement("button");
@@ -505,6 +513,14 @@ function updatePagination(page) {
         }
         paginationDiv.appendChild(pageBtn);
     }
+
+    // Last Button
+    let lastBtn = document.createElement("button");
+    lastBtn.textContent = "Last";
+    lastBtn.style.width = buttonWidth;
+    lastBtn.disabled = page === totalPages;
+    lastBtn.addEventListener("click", () => displayPage(totalPages));
+    paginationDiv.appendChild(lastBtn);
 
     // Jump-to-Page input
     let pageInput = document.createElement("input");

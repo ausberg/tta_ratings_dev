@@ -10,6 +10,7 @@ let activeFilterColumn = null; // Track which column is being filtered
 let searchQuery = "";  // Store the search term
 let autoRowsSet = false; // Track if Auto rows have been set already
 let manualRowsSet = false; // Track if the user manually selected rows
+let autoRowsInitialized = false; // Ensures Auto only runs once per page load
 
 function calculateRowsPerPage() {
     const tableContainer = document.querySelector(".table-container");
@@ -444,24 +445,25 @@ function displayPage(page) {
 }
 
 // Function to update rows per page dynamically
-
 function updateRowsPerPage() {
-    let selectedValue = document.getElementById("rowsPerPageSelect").value;
+    let selectElement = document.getElementById("rowsPerPageSelect");
+    let selectedValue = selectElement.value;
 
     if (selectedValue === "auto") {
-        if (!manualRowsSet) { 
-            rowsPerPage = calculateRowsPerPage(); // Only recalculate if manually selecting 'Auto'
-            autoRowsSet = true;
-        }
+        autoRowsInitialized = false; // Reset so Auto can recalculate again
+        rowsPerPage = calculateRowsPerPage();
+        autoRowsInitialized = true; // Prevent repeated recalculations
     } else {
         rowsPerPage = parseInt(selectedValue, 10);
-        manualRowsSet = true; // Ensure it sticks
-        autoRowsSet = false; // Disable auto adjustment if manually set
+        manualRowsSet = true; // Lock in manual selection
+        autoRowsInitialized = false; // Allow Auto to be selected again
     }
 
-    displayPage(1); // Reload table with new row count
-}
+    displayPage(1); // Reload table with the new row count
 
+    // Ensure the dropdown visually updates to reflect the actual selection
+    selectElement.value = selectedValue;
+}
 
 function jumpToPage() {
     let pageInput = document.getElementById("pageJumpInput").value.trim();
@@ -480,7 +482,7 @@ function jumpToPage() {
 function updatePagination(page) {
     const totalPages = Math.ceil(allRows.length / rowsPerPage);
     let paginationDiv = document.querySelector(".pagination");
-    
+
     // Clear existing pagination content
     paginationDiv.innerHTML = "";  
 
@@ -491,50 +493,35 @@ function updatePagination(page) {
     prevBtn.addEventListener("click", () => displayPage(page - 1));
     paginationDiv.appendChild(prevBtn);
 
-    // Determine the range of page numbers to display
+    // Generate page numbers dynamically
     let startPage = Math.max(1, page - 3);
     let endPage = Math.min(totalPages, page + 3);
 
-    // Show first page button if not already shown
     if (startPage > 1) {
         let firstPageBtn = document.createElement("button");
         firstPageBtn.textContent = "1";
         firstPageBtn.addEventListener("click", () => displayPage(1));
         paginationDiv.appendChild(firstPageBtn);
-
-        if (startPage > 2) {
-            let ellipsis = document.createElement("span");
-            ellipsis.textContent = "...";
-            paginationDiv.appendChild(ellipsis);
-        }
+        if (startPage > 2) paginationDiv.appendChild(document.createTextNode(" ... "));
     }
 
-    // Generate page buttons dynamically
     for (let i = startPage; i <= endPage; i++) {
         let pageBtn = document.createElement("button");
         pageBtn.textContent = i;
-        if (i === page) {
-            pageBtn.style.fontWeight = "bold";
-        }
+        if (i === page) pageBtn.style.fontWeight = "bold";
         pageBtn.addEventListener("click", () => displayPage(i));
         paginationDiv.appendChild(pageBtn);
     }
 
-    // Show last page button if not already shown
     if (endPage < totalPages) {
-        if (endPage < totalPages - 1) {
-            let ellipsis = document.createElement("span");
-            ellipsis.textContent = "...";
-            paginationDiv.appendChild(ellipsis);
-        }
-
+        if (endPage < totalPages - 1) paginationDiv.appendChild(document.createTextNode(" ... "));
         let lastPageBtn = document.createElement("button");
         lastPageBtn.textContent = totalPages;
         lastPageBtn.addEventListener("click", () => displayPage(totalPages));
         paginationDiv.appendChild(lastPageBtn);
     }
 
-    // Add the Jump-to-Page input
+    // Jump-to-Page input
     let pageInput = document.createElement("input");
     pageInput.type = "number";
     pageInput.id = "pageJumpInput";
@@ -545,13 +532,13 @@ function updatePagination(page) {
     pageInput.style.textAlign = "center";
     paginationDiv.appendChild(pageInput);
 
-    // Add the "Go" button
+    // "Go" button
     let goBtn = document.createElement("button");
     goBtn.textContent = "Go";
     goBtn.addEventListener("click", jumpToPage);
     paginationDiv.appendChild(goBtn);
 
-    // Create Next button
+    // Next button
     let nextBtn = document.createElement("button");
     nextBtn.id = "nextPageBtn";
     nextBtn.textContent = "Next";
@@ -559,8 +546,10 @@ function updatePagination(page) {
     nextBtn.addEventListener("click", () => displayPage(page + 1));
     paginationDiv.appendChild(nextBtn);
 
-    // Ensure rows-per-page dropdown exists and is inserted
-    if (!document.getElementById("rowsPerPageSelect")) {
+    // **Ensure rows-per-page dropdown is created only once**
+    let selectElement = document.getElementById("rowsPerPageSelect");
+
+    if (!selectElement) {
         let rowsPerPageContainer = document.createElement("div");
         rowsPerPageContainer.classList.add("rows-per-page-container");
         rowsPerPageContainer.innerHTML = `
@@ -574,12 +563,14 @@ function updatePagination(page) {
                 <option value="5000">Olesch</option>
             </select>
         `;
-
         paginationDiv.appendChild(rowsPerPageContainer);
 
-        // Attach event listener AFTER element is created
-        document.getElementById("rowsPerPageSelect").addEventListener("change", updateRowsPerPage);
+        selectElement = document.getElementById("rowsPerPageSelect");
+        selectElement.addEventListener("change", updateRowsPerPage);
     }
+
+    // **Ensure the dropdown reflects the actual selected value**
+    selectElement.value = autoRowsInitialized ? "auto" : rowsPerPage.toString();
 }
 
 let lastDownloadTime = 0;
@@ -807,9 +798,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // Load the table on page load
 window.onload = async function() {
-    rowsPerPage = calculateRowsPerPage();
-    autoRowsSet = true; // Set once at page load
-    await loadCSV();
+    if (!autoRowsInitialized) { // Ensure Auto only runs once
+        rowsPerPage = calculateRowsPerPage();
+        autoRowsInitialized = true; // Lock it
+    }
 
+    autoRowsSet = true; // Keep your original logic
+    await loadCSV();
     fetchLastCommitDate(); // Ensure last updated date is fetched
 };

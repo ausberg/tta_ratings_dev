@@ -58,6 +58,7 @@ async function loadCSV(filename = "ratings_overall.csv", preservePage = false) {
                 parseFloat(columns[5]).toFixed(0),  // Rating
                 parseFloat(columns[7]).toFixed(1),  // RD
                 parseFloat(columns[9]).toFixed(0),  // Opps
+                parseFloat(columns[14]).toFixed(0),  // Opps
                 parseFloat(columns[10]).toFixed(0),  // Ws
                 parseFloat(columns[15]).toFixed(0),  // Ws Δ
                 parseFloat(columns[11]).toFixed(0),  // Ls
@@ -68,7 +69,7 @@ async function loadCSV(filename = "ratings_overall.csv", preservePage = false) {
             ];           
         
             return selectedColumns;
-        }).filter(columns => columns.length === 15);
+        }).filter(columns => columns.length === 16);
 
         // Reset sorting state when loading a new dataset
         sortDirection = {};
@@ -94,12 +95,12 @@ async function loadCSV(filename = "ratings_overall.csv", preservePage = false) {
 // Ensure the highlight formatting applies correctly
 function formatColumn(value, index) {
     // Columns where highlight formatting applies
-    const highlightColumns = [1, 4, 9, 11, 14]; // Adjust as needed
+    const highlightColumns = [1, 4, 8, 10, 12, 15]; // Adjust as needed
 
     let num = parseFloat(value);
 
     // Special case: Column 11 should be red **only if the value is greater than 0**
-    if (index === 11 && !isNaN(num) && num > 0) {
+    if (index === 12 && !isNaN(num) && num > 0) {
         return `<td class="red">+${num}</td>`;
     }
 

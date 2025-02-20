@@ -8,13 +8,13 @@ This document lists all the tournaments included in the ratings system.
 - **Eiffel Tower** up to Season 2
 - **Intermezzo Championship** up to Season 19
 - **International Championship** up to Season 28
-- **Mercurial Ladder** up to Round 20
+- **Mercurial Ladder** up to Round 21
 - **Nations League** from Season 2 up to Season 10
 - **Premier League** up to Season 4
 - **Royal League** up to Season 2
 - **Slow Burn** up to Season 6
 - **Sodium Ladder** up to Season 2
-- **Transcontinental Ladder** up to Round 119
+- **Transcontinental Ladder** up to Round 121
 - **Wimbledon 2023**
 - **World Championship 2022**
 - **World Championship 2023**

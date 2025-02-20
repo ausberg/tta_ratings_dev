@@ -12,11 +12,11 @@ This document provides definitions for each column in the ratings table to help 
 ### **Player**
 - The name of the player.
 
-### **Conservative Rating**
+### **C Rating**
 - Calculated as `Rating - (3 * RD)`, ensuring a more stable ranking for players with high uncertainty.
 - Used to sort players in the leaderboard.
 
-### **Conservative Δ**
+### **C R Δ**
 - The change in a player's Conservative Rating since the start of the rating period.
 
 ### **Rating**
@@ -35,7 +35,7 @@ This document provides definitions for each column in the ratings table to help 
 ### **Opponents**
 - The total number of opponents the player has faced.
 
-### **Opponents Δ**
+### **O Δ**
 - The change in the number of opponents faced since the start of the rating period.
 
 ### **Wins**

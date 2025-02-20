@@ -54,7 +54,7 @@ async function loadCSV(filename = "ratings_overall.csv", preservePage = false) {
                 columns[1],  // Rank Δ
                 columns[2],  // Player
                 parseFloat(columns[3]).toFixed(0),  // Cons. Rating
-                parseFloat(columns[4]).toFixed(2),  // Cons. Δ
+                parseFloat(columns[4]).toFixed(1),  // Cons. Δ
                 parseFloat(columns[5]).toFixed(0),  // Rating
                 parseFloat(columns[7]).toFixed(1),  // RD
                 parseFloat(columns[9]).toFixed(0),  // Opps

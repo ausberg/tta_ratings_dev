@@ -84,7 +84,7 @@ tr:nth-child(odd) { background-color: #E6D2BA; }
     max-width: 100%;
     margin-left: auto;
     margin-right: auto;
-    gap: 170px;
+    gap: 250px;
 }
 
 /* Ratings + Search group (Align Left) */

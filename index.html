@@ -32,23 +32,22 @@
                 <button id="ratings2pBtn" class="ctrl-btn" data-filename="ratings_2p.csv">2P Ratings</button>
                 <button id="ratings3pBtn" class="ctrl-btn" data-filename="ratings_3p.csv">3P Ratings</button>
                 <button id="ratings4pBtn" class="ctrl-btn" data-filename="ratings_4p.csv">4P Ratings</button>
-
+            
                 <div class="ratings-spacer"></div>
-
+            
                 <input type="text" id="search" class="tooltip-btn" 
                     placeholder="player1, player2, player3"
-                    title="Enter a player's name to filter the table.
-
-        Use commas to search multiple names.
-
-        You can also jump to a single player's page by entering their name and clicking 'Show Player Page'.">
-
+                    title="Search Tips:
+            - Use commas to search multiple names (e.g., Alice, Bob).
+            - Use quotes to search for an exact name. Example: 'Arne' finds only Arne, not Arnekin.
+            - To jump directly to a player’s page, enter a single name (no commas) and click 'Show Player Page'.">
+                
                 <button id="jumpToPlayerBtn" class="ctrl-btn tooltip-btn"
-                    data-tooltip="Click to jump directly to a player's page.&#10;&#10;
-                                Only works if a single name is entered (no commas).">
+                    title="Click to jump directly to a player's page.
+            - This only works if a single name is entered (no commas).">
                     Show Player Page
                 </button>
-            </div>
+            </div>            
         
             <div class="controls-section export-buttons">
                 <button id="ctrl-btn" class="ctrl-btn tooltip-btn" data-tooltip="Download the currently displayed table data as a CSV file.">Export Current</button>

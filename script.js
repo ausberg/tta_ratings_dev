@@ -654,8 +654,9 @@ function searchTable() {
         let playerName = row[3];
 
         return searchNames.some(name => {
-            if (name.startsWith('"') && name.endsWith('"')) {
-                // Exact match (removing quotes)
+            // Check for both single ('name') and double ("name") quotes
+            if ((name.startsWith('"') && name.endsWith('"')) || (name.startsWith("'") && name.endsWith("'"))) {
+                // Exact match (remove quotes)
                 return playerName.toLowerCase() === name.slice(1, -1).toLowerCase();
             } else {
                 // Partial match

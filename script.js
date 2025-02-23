@@ -84,8 +84,8 @@ async function loadCSV(filename = "ratings_overall.csv", preservePage = false) {
         setTimeout(() => {
             searchInput.value = searchQuery; // Restore previous search term
             applyStoredFilters(); // Ensure column filters are applied first
-            applySearchFilter(); // Apply search on top of filtered data
-        }, 500);                         
+            searchTable(); // Apply search on top of filtered data
+        }, 300);                         
 
     } catch (error) {
         console.error("Error loading CSV:", error);

@@ -52,6 +52,7 @@ async function loadCSV(filename = "ratings_overall.csv", preservePage = false) {
             let selectedColumns = [
                 columns[0],  // Rank
                 columns[1],  // Rank Δ
+                columns[20], // Title
                 columns[2],  // Player
                 parseFloat(columns[3]).toFixed(0),  // C Rating
                 parseFloat(columns[4]).toFixed(1),  // C R Δ
@@ -70,7 +71,7 @@ async function loadCSV(filename = "ratings_overall.csv", preservePage = false) {
             ];           
         
             return selectedColumns;
-        }).filter(columns => columns.length === 17);
+        }).filter(columns => columns.length === 18);
 
         // Reset sorting state when loading a new dataset
         sortDirection = {};
@@ -96,12 +97,12 @@ async function loadCSV(filename = "ratings_overall.csv", preservePage = false) {
 // Ensure the highlight formatting applies correctly
 function formatColumn(value, index) {
     // Columns where highlight formatting applies
-    const highlightColumns = [1, 4, 6, 9, 11, 13, 16]; // Adjust as needed
+    const highlightColumns = [1, 5, 7, 10, 12, 14, 17]; // Adjust as needed
 
     let num = parseFloat(value);
 
     // Special case: Column 11 should be red **only if the value is greater than 0**
-    if (index === 13 && !isNaN(num) && num > 0) {
+    if (index === 14 && !isNaN(num) && num > 0) {
         return `<td class="red">+${num}</td>`;
     }
 

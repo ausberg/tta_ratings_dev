@@ -5,16 +5,22 @@ This document provides definitions for each column in the ratings table to help 
 ## Table Columns
 
 ### **Rank**
-- The player's position in the leaderboard based on their Conservative Rating.
+- The player's position on the leaderboard based on their Conservative Rating.
 - Lower numbers indicate a higher ranking.
 - "-" denotes inactive players.
+
+### **Rank Δ**
+- The change in a player's position on the leaderboard since the start of the rating period.
+
+### **Title**
+- The highest division ever achieved by the player in the International or Intermezzo tournament.
 
 ### **Player**
 - The name of the player.
 
 ### **C Rating**
 - Calculated as `Rating - (3 * RD)`, ensuring a more stable ranking for players with high uncertainty.
-- Used to sort players in the leaderboard.
+- Used to sort players on the leaderboard.
 
 ### **C R Δ**
 - The change in a player's Conservative Rating since the start of the rating period.

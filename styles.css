@@ -84,7 +84,7 @@ tr:nth-child(odd) { background-color: #E6D2BA; }
     max-width: 100%;
     margin-left: auto;
     margin-right: auto;
-    gap: 250px;
+    gap: 240px;
 }
 
 /* Ratings + Search group (Align Left) */
@@ -98,7 +98,7 @@ tr:nth-child(odd) { background-color: #E6D2BA; }
 
 /* Adds space ONLY after the last Ratings button */
 .ratings-spacer {
-    width: 50px; /* Adjust to control space between Ratings and Search */
+    width: 125px; /* Adjust to control space between Ratings and Search */
     flex-shrink: 0; /* Prevents it from collapsing */
 }
 

@@ -19,11 +19,11 @@ This document provides definitions for each column in the ratings table to help 
 ### **C R Δ**
 - The change in a player's Conservative Rating since the start of the rating period.
 
-### **Rating**
-- The player's estimated skill level, updated based on game results.
+### **E Rating**
+- The player's estimated skill level.
 
-### **Rating Δ**
-- The change in a player's Rating since the start of the rating period.
+### **E R Δ**
+- The change in a player's E Rating since the start of the rating period.
 
 ### **RD (Rating Deviation)**
 - Represents the uncertainty of the player's rating.

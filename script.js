@@ -53,18 +53,18 @@ async function loadCSV(filename = "ratings_overall.csv", preservePage = false) {
                 columns[0],  // Rank
                 columns[1],  // Rank Δ
                 columns[2],  // Player
-                parseFloat(columns[3]).toFixed(0),  // Cons. Rating
-                parseFloat(columns[4]).toFixed(1),  // Cons. Δ
+                parseFloat(columns[3]).toFixed(0),  // C Rating
+                parseFloat(columns[4]).toFixed(1),  // C R Δ
                 parseFloat(columns[5]).toFixed(0),  // Rating
                 parseFloat(columns[7]).toFixed(1),  // RD
                 parseFloat(columns[9]).toFixed(0),  // Opps
-                parseFloat(columns[14]).toFixed(0),  // Opps
-                parseFloat(columns[10]).toFixed(0),  // Ws
-                parseFloat(columns[15]).toFixed(0),  // Ws Δ
-                parseFloat(columns[11]).toFixed(0),  // Ls
-                parseFloat(columns[16]).toFixed(0),  // Ls Δ
-                parseFloat(columns[12]).toFixed(0),  // Ds
-                parseFloat(columns[13]).toFixed(1),  // Win %
+                parseFloat(columns[10]).toFixed(0),  // Opps Δ
+                parseFloat(columns[11]).toFixed(0),  // Ws
+                parseFloat(columns[12]).toFixed(0),  // Ws Δ
+                parseFloat(columns[13]).toFixed(0),  // Ls
+                parseFloat(columns[14]).toFixed(0),  // Ls Δ
+                parseFloat(columns[15]).toFixed(0),  // Ds
+                parseFloat(columns[17]).toFixed(1),  // W%
                 parseFloat(columns[18]).toFixed(2)   // W% Δ
             ];           
         

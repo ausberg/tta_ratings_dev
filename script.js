@@ -652,7 +652,7 @@ function searchTable() {
     let searchNames = searchQuery.split(",").map(name => name.trim().toLowerCase());
 
     filteredRows = allRows.filter(row =>
-        typeof row[2] === "string" && searchNames.some(name => row[2].toLowerCase().includes(name))
+        typeof row[3] === "string" && searchNames.some(name => row[3].toLowerCase().includes(name))
     );
 
     // console.log("Filtered Rows:", filteredRows.length);
@@ -666,7 +666,7 @@ function applySearchFilter() {
 
     // Ensure search is applied AFTER column filters
     filteredRows = (filteredRows.length > 0 ? filteredRows : allRows).filter(row =>
-        typeof row[2] === "string" && searchNames.some(name => row[2].toLowerCase().includes(name))
+        typeof row[3] === "string" && searchNames.some(name => row[3].toLowerCase().includes(name))
     );
 
     displayPage(1); // Refresh the table with filtered results
@@ -682,7 +682,7 @@ function jumpToPlayer() {
     }
 
     // Find the player's index in the FULL dataset (allRows)
-    let foundIndex = allRows.findIndex(row => row[2].toLowerCase() === query);
+    let foundIndex = allRows.findIndex(row => row[3].toLowerCase() === query);
 
     if (foundIndex === -1) {
         alert(`Player "${query}" not found.`);

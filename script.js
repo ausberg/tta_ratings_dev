@@ -640,22 +640,30 @@ function exportAllCSV() {
 // Searches the table for rows that match the input query
 function searchTable() {
     searchQuery = document.getElementById("search").value.trim(); // Store the search term
-    // console.log("Search Query:", searchQuery);
 
     if (!searchQuery) {
-        console.log("Empty search, resetting filters.");
         applyAllFilters();  // Ensure filters still apply
         displayPage(1);
         return;
     }
 
-    let searchNames = searchQuery.split(",").map(name => name.trim().toLowerCase());
+    let searchNames = searchQuery.split(",").map(name => name.trim());
 
-    filteredRows = allRows.filter(row =>
-        typeof row[3] === "string" && searchNames.some(name => row[3].toLowerCase().includes(name))
-    );
+    filteredRows = allRows.filter(row => {
+        if (typeof row[3] !== "string") return false;
+        let playerName = row[3];
 
-    // console.log("Filtered Rows:", filteredRows.length);
+        return searchNames.some(name => {
+            if (name.startsWith('"') && name.endsWith('"')) {
+                // Exact match (removing quotes)
+                return playerName.toLowerCase() === name.slice(1, -1).toLowerCase();
+            } else {
+                // Partial match
+                return playerName.toLowerCase().includes(name.toLowerCase());
+            }
+        });
+    });
+
     displayPage(1);
 }
 

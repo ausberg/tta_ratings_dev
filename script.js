@@ -42,14 +42,13 @@ async function loadCSV(filename = "ratings_overall.csv", preservePage = false) {
     try {
         const response = await fetch(`https://raw.githubusercontent.com/ausberg/tta_ratings_dev/main/ratings/${filename}`);
         if (!response.ok) throw new Error(`Failed to load ${filename}, status: ${response.status}`);
-
+    
         const data = await response.text();
-
-        allRows = data.trim().split("\n").slice(1).map(row => {
+    
+        let rawRows = data.trim().split("\n").slice(1).map(row => {
             let columns = row.split(/,|;/).map(value => isNaN(value) ? value : parseFloat(value)); // Convert numbers correctly
         
-            // Remove unwanted columns by their index positions (e.g., RD Δ, Opps Δ, W% Δ)
-            let selectedColumns = [
+            return [
                 columns[0],  // Rank
                 columns[1],  // Rank Δ
                 columns[20], // Title
@@ -68,11 +67,18 @@ async function loadCSV(filename = "ratings_overall.csv", preservePage = false) {
                 parseFloat(columns[15]).toFixed(0),  // Ds
                 parseFloat(columns[17]).toFixed(1),  // W%
                 parseFloat(columns[18]).toFixed(2)   // W% Δ
-            ];           
-        
-            return selectedColumns;
+            ];
         }).filter(columns => columns.length === 18);
-
+    
+        allRows = rawRows; // Store processed rows
+    
+        // Now that allRows is built, store raw player names separately
+        playerRawNames = {}; // Reset to prevent duplicates
+        allRows.forEach((row, index) => {
+            let rawPlayerName = row[3].replace(/<[^>]+>/g, "").trim(); // Remove HTML tags from formatted name
+            playerRawNames[rawPlayerName.toLowerCase()] = index;
+        });
+    
         // Reset sorting state when loading a new dataset
         sortDirection = {};
         filteredRows = [];
@@ -85,7 +91,7 @@ async function loadCSV(filename = "ratings_overall.csv", preservePage = false) {
             searchInput.value = searchQuery; // Restore previous search term
             applyStoredFilters(); // Ensure column filters are applied first
             searchTable(); // Apply search on top of filtered data
-        }, 300);                         
+        }, 300);                      
 
     } catch (error) {
         console.error("Error loading CSV:", error);
@@ -663,20 +669,20 @@ function searchTable() {
         return;
     }
 
-    let searchNames = searchQuery.split(",").map(name => name.trim());
+    let searchNames = searchQuery.split(",").map(name => name.trim().toLowerCase());
 
     filteredRows = allRows.filter(row => {
         if (typeof row[3] !== "string") return false;
-        let playerName = row[3];
+
+        let playerName = row[3].replace(/<\/?[^>]+(>|$)/g, "").trim().toLowerCase(); // Strip HTML before search
 
         return searchNames.some(name => {
-            // Check for both single ('name') and double ("name") quotes
             if ((name.startsWith('"') && name.endsWith('"')) || (name.startsWith("'") && name.endsWith("'"))) {
                 // Exact match (remove quotes)
-                return playerName.toLowerCase() === name.slice(1, -1).toLowerCase();
+                return playerName === name.slice(1, -1);
             } else {
                 // Partial match
-                return playerName.toLowerCase().includes(name.toLowerCase());
+                return playerName.includes(name);
             }
         });
     });
@@ -706,10 +712,10 @@ function jumpToPlayer() {
         return;
     }
 
-    // Find the player's index in the FULL dataset (allRows)
-    let foundIndex = allRows.findIndex(row => row[3].toLowerCase() === query);
+    // Search for the player's index using the raw name dictionary
+    let foundIndex = playerRawNames[query];
 
-    if (foundIndex === -1) {
+    if (foundIndex === undefined) {
         alert(`Player "${query}" not found.`);
         return;
     }
@@ -728,7 +734,7 @@ function jumpToPlayer() {
 
     setTimeout(() => {
         displayPage(pageNumber);
-    }, 300); // Ensure dataset loads first
+    }, 300);
 }
 
 document.addEventListener("DOMContentLoaded", function () {

@@ -143,11 +143,13 @@ function formatPlayerName(player) {
     let icon = '';
 
     if (player === "Martin_Pecheur") {
-        icon = '<img class="trophy gold-trophy" src="images/gold_trophy.png" alt="Gold Trophy">';
+        icon = '<img class="trophy gold-trophy" src="images/gold_trophy.png" alt="Gold Trophy" title="2024 World Champion - Martin_Pecheur">';
     } else if (player === "pv4") {
-        icon = '<img class="trophy silver-trophy" src="images/silver_trophy.png" alt="Silver Trophy">';
+        icon = '<img class="trophy silver-trophy" src="images/silver_trophy.png" alt="Silver Trophy" title="2024 World Runner-Up - pv4">';
     } else if (player === "Weidenbaum") {
-        icon = '<img class="trophy bronze-trophy" src="images/bronze_trophy.png" alt="Bronze Trophy">';
+        icon = '<img class="trophy bronze-trophy" src="images/bronze_trophy.png" alt="Bronze Trophy" title="2024 World 3rd Place - Weidenbaum">';
+    } else if (player === "e5582768") {
+        icon = '<img class="trophy fourth-place-ribbon" src="images/fourth_place.png" alt="4th Place Ribbon" title="2024 World 4th Place - e5582768">';
     }
 
     return `${icon} ${player}`;

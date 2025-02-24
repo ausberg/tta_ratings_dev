@@ -343,3 +343,7 @@ h2, p {
 .bronze-trophy {
     content: url('images/bronze_trophy.png');
 }
+
+.fourth-place-ribbon {
+    content: url('images/fourth_place.png');
+}

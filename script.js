@@ -46,13 +46,20 @@ async function loadCSV(filename = "ratings_overall.csv", preservePage = false) {
     
         let rawRows = data.trim().split("\n").slice(1).map(row => {
             let columns = row.split(/,|;/).map(value => isNaN(value) ? value : parseFloat(value)); // Convert numbers correctly
+            
+            // Convert country code to flag icon
+            let countryCode = columns[3] ? columns[3].toUpperCase() : ""; // Ensure uppercase
+            let flagImg = countryCode 
+                ? `<img src="https://raw.githubusercontent.com/yammadev/flag-icons/master/png/${countryCode}.png" 
+                        alt="${countryCode}" title="${countryCode}" width="20" height="15">`
+                : "🌍"; // Fallback for missing flags
         
             return [
                 columns[0],  // Rank
                 columns[1],  // Rank Δ
                 columns[21], // Title
                 formatPlayerName(columns[2]),  // Player name with trophy
-                parseFloat(columns[3]).toFixed(0),  // Country
+                flagImg,  // Country (Flag icon instead of code)
                 parseFloat(columns[4]).toFixed(0),  // C Rating
                 parseFloat(columns[5]).toFixed(1),  // C R Δ
                 parseFloat(columns[6]).toFixed(0),  // Rating
@@ -68,7 +75,7 @@ async function loadCSV(filename = "ratings_overall.csv", preservePage = false) {
                 parseFloat(columns[18]).toFixed(1),  // W%
                 parseFloat(columns[19]).toFixed(2)   // W% Δ
             ];
-        }).filter(columns => columns.length === 19);
+        }).filter(columns => columns.length === 19);        
     
         allRows = rawRows; // Store processed rows
     

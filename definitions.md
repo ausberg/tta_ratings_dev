@@ -29,53 +29,53 @@ This document provides definitions for each column in the ratings table to help 
 - Calculated as `Rating - (3 * RD)`, ensuring a more stable ranking for players with high uncertainty.
 - Used to sort players on the leaderboard.
 
-### **C R Δ**
+### **CRΔ**
 - The change in a player's Conservative Rating since the start of the rating period.
 
 ### **E Rating**
 - The player's estimated skill level.
 
-### **E R Δ**
+### **ERΔ**
 - The change in a player's E Rating since the start of the rating period.
 
 ### **RD (Rating Deviation)**
 - Represents the uncertainty of the player's rating.
 - Lower values mean the rating is more stable, while higher values indicate fewer recent games.
 
-### **RD Δ**
+### **RDΔ**
 - The change in a player's Rating Deviation since the start of the rating period.
 
-### **Opponents**
+### **Opps**
 - The total number of opponents the player has faced.
 
-### **O Δ**
+### **OΔ**
 - The change in the number of opponents faced since the start of the rating period.
 
-### **Wins**
+### **Ws**
 - The total number of games the player has won.
 
-### **Wins Δ**
+### **WsΔ**
 - The change in the number of wins since the start of the rating period.
 
-### **Losses**
+### **Ls**
 - The total number of games the player has lost.
 
-### **Losses Δ**
+### **LsΔ**
 - The change in the number of losses since the start of the rating period.
 
-### **Draws**
+### **Ds**
 - The total number of games that ended in a draw.
 
-### **Draws Δ**
+### **DΔ**
 - The change in the number of draws since the start of the rating period.
 
-### **Win%**
+### **W%**
 - The percentage of games the player has won, calculated as:
   ```
   Win% = (Wins / (Wins + Losses + Draws)) * 100
   ```
 
-### **Win% Δ**
+### **W%Δ**
 - The change in a player's Win Percentage since the start of the rating period.
 
 ---

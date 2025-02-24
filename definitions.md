@@ -22,6 +22,9 @@ This document provides definitions for each column in the ratings table to help 
 ### **Player**
 - The name of the player.
 
+### **CO**
+- The player's country.
+
 ### **C Rating**
 - Calculated as `Rating - (3 * RD)`, ensuring a more stable ranking for players with high uncertainty.
 - Used to sort players on the leaderboard.

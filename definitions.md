@@ -80,5 +80,5 @@ This document provides definitions for each column in the ratings table to help 
 
 ---
 
-For more details, visit the [GitHub repository](https://github.com/ausberg/tta_ratings).
+For more details, visit the [GitHub repository](https://github.com/ausberg/tta_ratings_dev).
 

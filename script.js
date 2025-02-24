@@ -53,7 +53,7 @@ async function loadCSV(filename = "ratings_overall.csv", preservePage = false) {
                 columns[0],  // Rank
                 columns[1],  // Rank Δ
                 columns[20], // Title
-                columns[2],  // Player
+                formatPlayerName(columns[2]),  // Player name with trophy
                 parseFloat(columns[3]).toFixed(0),  // C Rating
                 parseFloat(columns[4]).toFixed(1),  // C R Δ
                 parseFloat(columns[5]).toFixed(0),  // Rating
@@ -138,6 +138,20 @@ async function fetchLastCommitDate() {
     }
 }
 fetchLastCommitDate();
+
+function formatPlayerName(player) {
+    let icon = '';
+
+    if (player === "Martin_Pecheur") {
+        icon = '<img class="trophy gold-trophy" src="images/gold_trophy.png" alt="Gold Trophy">';
+    } else if (player === "pv4") {
+        icon = '<img class="trophy silver-trophy" src="images/silver_trophy.png" alt="Silver Trophy">';
+    } else if (player === "Weidenbaum") {
+        icon = '<img class="trophy bronze-trophy" src="images/bronze_trophy.png" alt="Bronze Trophy">';
+    }
+
+    return `${icon} ${player}`;
+}
 
 function addSorting() {
     document.querySelectorAll("th").forEach((th, index) => {

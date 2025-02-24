@@ -323,3 +323,23 @@ h2, p {
     font-weight: bold;
     border: 2px solid #DAA520;
 }
+
+.trophy {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-right: 1px;
+    vertical-align: middle;
+}
+
+.gold-trophy {
+    content: url('images/gold_trophy.png');
+}
+
+.silver-trophy {
+    content: url('images/silver_trophy.png');
+}
+
+.bronze-trophy {
+    content: url('images/bronze_trophy.png');
+}

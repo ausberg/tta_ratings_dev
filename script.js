@@ -165,10 +165,18 @@ function formatPlayerName(player) {
     } else if (player === "e5582768") {
         icon = '<img class="trophy fourth-place-ribbon" src="images/fourth_place.png" alt="4th Place Ribbon" title="2024 World 4th Place - e5582768">';
     } else if ([
-        "Lcfyx", "Wawrzyniec", "St4nkk", "Pascalotopia",
-        "mbbchess", "RutgerHauer", "Genghisip", "Gilgamesh2", "Vantablack"
+        "Lcfyx", "Wawrzyniec", "St4nkk", "Pascalotopia", "mbbchess", "RutgerHauer", 
+        "Genghisip", "Gilgamesh2", "Vantablack"
     ].includes(player)) {
         icon = '<img class="trophy sf-icon" src="images/semi_finalist.png" alt="Semi-Finalist" title="2024 World Semi-Finalist - ' + player + '">';
+    } else if ([
+        "Tordread", "totsilence", "Flackk", "321letsjam", "DJParson", "DJLAODIE", 
+        "Dantes", "bobaboba", "a440", "Majondor", "Fourierrr", "CaesarSalah", "Lech", 
+        "SnailZane", "FirstOfDao", "Sylvain", "treitze", "Berfner", "Eepogi", 
+        "barboucha", "Brightfuture", "Gutemetralla", "Grozz", "Musan", "Fjantarik", 
+        "Hsugneslie", "Snucka"
+    ].includes(player)) {
+        icon = '<img class="trophy qf-icon" src="images/quarter_finalist.png" alt="Quarter-Finalist" title="2024 World Quarter-Finalist - ' + player + '">';
     }
 
     return `${icon} ${player}`;

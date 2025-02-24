@@ -320,7 +320,7 @@ function applyAllFilters() {
 
     filteredRows = allRows.filter(row => {
         return Object.entries(activeFilters).every(([colIndex, filterValue]) => {
-            let cellValue = row[parseInt(colIndex)].toString().toLowerCase().trim();
+            let cellValue = row[parseInt(colIndex)];
 
             // Extract numeric value (if applicable)
             let numericValue = parseFloat(cellValue);
@@ -331,19 +331,29 @@ function applyAllFilters() {
             let operator = operatorMatch ? operatorMatch[0] : "=";
             let condition = filterValue.replace(/^(<=|>=|>|<|=|!=)\s*/, "").toLowerCase(); // Remove operator from input
 
+            // Special Handling: Country Code Filtering
+            if (parseInt(colIndex) === 4) { // Column index for Country Code (CO)
+                let match = cellValue.match(/alt="([A-Z]+)"/);
+                let countryCode = match ? match[1] : "Unknown"; // Extract "US", "DE", etc.
+
+                if (operator === "=") return countryCode === condition.toUpperCase();
+                if (operator === "!=") return countryCode !== condition.toUpperCase();
+                return false; // Ignore other operators for non-numeric values
+            }
+
             // **Handle `!=` (not equal) for BOTH text and numeric values**
             if (operator === "!=") {
                 if (!isNaN(numericValue) && !isNaN(numericCondition)) {
                     return numericValue !== numericCondition; // Numeric comparison
                 }
-                return cellValue !== condition; // String comparison
+                return cellValue.toLowerCase() !== condition; // String comparison
             }
 
             // **String-based Filtering**
             if (isNaN(numericValue)) { // If not a number, treat as string
                 switch (operator) {
-                    case "=": return cellValue === condition;
-                    default: return cellValue.includes(condition); // Default substring match
+                    case "=": return cellValue.toLowerCase() === condition;
+                    default: return cellValue.toLowerCase().includes(condition); // Default substring match
                 }
             }
 

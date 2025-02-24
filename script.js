@@ -164,6 +164,11 @@ function formatPlayerName(player) {
         icon = '<img class="trophy bronze-trophy" src="images/bronze_trophy.png" alt="Bronze Trophy" title="2024 World 3rd Place - Weidenbaum">';
     } else if (player === "e5582768") {
         icon = '<img class="trophy fourth-place-ribbon" src="images/fourth_place.png" alt="4th Place Ribbon" title="2024 World 4th Place - e5582768">';
+    } else if ([
+        "Lcfyx", "Wawrzyniec", "St4nkk", "Pascalotopia",
+        "mbbchess", "RutgerHauer", "Genghisip", "Gilgamesh2", "Vantablack"
+    ].includes(player)) {
+        icon = '<img class="trophy sf-icon" src="images/semi_finalist.png" alt="Semi-Finalist" title="2024 World Semi-Finalist - ' + player + '">';
     }
 
     return `${icon} ${player}`;

@@ -347,3 +347,7 @@ h2, p {
 .fourth-place-ribbon {
     content: url('images/fourth_place.png');
 }
+
+.sf-icon {
+    content: url('images/semi_finalist.png');
+}

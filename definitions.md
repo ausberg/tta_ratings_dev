@@ -13,7 +13,7 @@ This document provides definitions for each column in the ratings table to help 
 - The change in a player's position on the leaderboard since the start of the rating period.
 
 ### **Title**
-- The highest division ever achieved by the player in the International or Intermezzo tournament.
+- The highest division ever reached by a player in the International or Intermezzo tournament.
 - GM: Grandmaster
 - M: Master
 - P: Platinum

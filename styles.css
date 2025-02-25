@@ -340,6 +340,7 @@ h2, p {
     height: 16px;
     margin-right: 1px;
     vertical-align: middle;
+    margin-bottom: 3px; /* Nudges it up */
 }
 
 .gold-trophy {
@@ -378,4 +379,5 @@ h2, p {
     height: 14px;
     vertical-align: middle;
     margin-left: 1px;
+    margin-bottom: 2px; /* Nudges it up */
 }

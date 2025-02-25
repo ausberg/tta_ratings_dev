@@ -127,7 +127,7 @@ function formatColumn(value, index) {
 
     let num = parseFloat(value);
 
-    // Special case: Column 11 should be red **only if the value is greater than 0**
+    // Special case: Column 16 should be red **only if the value is greater than 0**
     if (index === 16 && !isNaN(num) && num > 0) {
         return `<td class="red">+${num}</td>`;
     }
@@ -211,18 +211,28 @@ function addSorting() {
         th.addEventListener("click", function (event) {
             if (event.target.classList.contains("filter-btn")) return; // Ignore filter button clicks
 
-            // Toggle sorting direction (default is ascending)
-            sortDirection[index] = sortDirection[index] ? -sortDirection[index] : -1;
+            // Toggle sorting direction (default is descending for most columns)
+            if (index === 0 || index === 2) {
+                // Rk and LbRk should sort ascending by default
+                sortDirection[index] = sortDirection[index] ? -sortDirection[index] : 1;
+            } else {
+                // All other columns sort descending by default
+                sortDirection[index] = sortDirection[index] ? -sortDirection[index] : -1;
+            }
 
             let dataToSort = filteredRows.length > 0 ? [...filteredRows] : [...allRows]; // Work on a copy
 
             dataToSort.sort((a, b) => {
                 let valA = a[index], valB = b[index];
             
-                // Special case: Sorting "Player" column (index 2)
-                if (index === 2) {
-                    return sortDirection[index] * valA.toString().localeCompare(valB.toString(), undefined, { numeric: true, sensitivity: 'base' });
-                }
+                // Special case: Sorting "Player" column (index 4)
+                if (index === 4) {
+                    // Strip HTML tags to get the actual player name
+                    let cleanA = valA.replace(/<\/?[^>]+(>|$)/g, "").trim();
+                    let cleanB = valB.replace(/<\/?[^>]+(>|$)/g, "").trim();
+                
+                    return sortDirection[index] * cleanA.localeCompare(cleanB, undefined, { numeric: true, sensitivity: 'base' });
+                }                
             
                 // Convert numeric columns to numbers for sorting
                 valA = isNaN(valA) ? null : parseFloat(valA);

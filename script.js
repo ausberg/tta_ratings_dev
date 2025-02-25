@@ -69,6 +69,7 @@ async function loadCSV(filename = "ratings_overall.csv", preservePage = false) {
             return [
                 columns[0],  // Rank
                 columns[1],  // Rank Δ
+                columns[22], // Leaderboard Rank
                 columns[21], // Title
                 formatPlayerName(columns[2]),  // Player name with trophy
                 flagImg,  // Country (Flag icon with proper fallback)
@@ -87,14 +88,14 @@ async function loadCSV(filename = "ratings_overall.csv", preservePage = false) {
                 parseFloat(columns[18]).toFixed(1),  // W%
                 parseFloat(columns[19]).toFixed(2)   // W% Δ
             ];
-        }).filter(columns => columns.length === 19);                     
+        }).filter(columns => columns.length === 20);                     
     
         allRows = rawRows; // Store processed rows
     
         // Now that allRows is built, store raw player names separately
         playerRawNames = {}; // Reset to prevent duplicates
         allRows.forEach((row, index) => {
-            let rawPlayerName = row[3].replace(/<[^>]+>/g, "").trim(); // Remove HTML tags from formatted name
+            let rawPlayerName = row[4].replace(/<[^>]+>/g, "").trim(); // Remove HTML tags from formatted name
             playerRawNames[rawPlayerName.toLowerCase()] = index;
         });
     
@@ -122,12 +123,12 @@ async function loadCSV(filename = "ratings_overall.csv", preservePage = false) {
 // Ensure the highlight formatting applies correctly
 function formatColumn(value, index) {
     // Columns where highlight formatting applies
-    const highlightColumns = [1, 6, 8, 11, 13, 15, 18]; // Adjust as needed
+    const highlightColumns = [1, 2, 7, 9, 12, 14, 16, 19]; // Adjust as needed
 
     let num = parseFloat(value);
 
     // Special case: Column 11 should be red **only if the value is greater than 0**
-    if (index === 15 && !isNaN(num) && num > 0) {
+    if (index === 16 && !isNaN(num) && num > 0) {
         return `<td class="red">+${num}</td>`;
     }
 
@@ -722,9 +723,9 @@ function searchTable() {
     let searchNames = searchQuery.split(",").map(name => name.trim().toLowerCase());
 
     filteredRows = allRows.filter(row => {
-        if (typeof row[3] !== "string") return false;
+        if (typeof row[4] !== "string") return false;
 
-        let playerName = row[3].replace(/<\/?[^>]+(>|$)/g, "").trim().toLowerCase(); // Strip HTML before search
+        let playerName = row[4].replace(/<\/?[^>]+(>|$)/g, "").trim().toLowerCase(); // Strip HTML before search
 
         return searchNames.some(name => {
             if ((name.startsWith('"') && name.endsWith('"')) || (name.startsWith("'") && name.endsWith("'"))) {
@@ -747,7 +748,7 @@ function applySearchFilter() {
 
     // Ensure search is applied AFTER column filters
     filteredRows = (filteredRows.length > 0 ? filteredRows : allRows).filter(row =>
-        typeof row[3] === "string" && searchNames.some(name => row[3].toLowerCase().includes(name))
+        typeof row[4] === "string" && searchNames.some(name => row[4].toLowerCase().includes(name))
     );
 
     displayPage(1); // Refresh the table with filtered results

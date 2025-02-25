@@ -72,7 +72,7 @@ tr:nth-child(odd) { background-color: #E6D2BA; }
 /* ========================== */
 /*  Set minimum width for Player column  */
 /* ========================== */
-th:nth-child(4), td:nth-child(4) {
+th:nth-child(5), td:nth-child(5) {
     min-width: 150px; /* Adjust width as needed */
     max-width: 250px; /* Optional: prevents excessive stretching */
     overflow: hidden;
@@ -94,7 +94,7 @@ th:nth-child(4), td:nth-child(4) {
     max-width: 100%;
     margin-left: auto;
     margin-right: auto;
-    gap: 300px;
+    gap: 330px;
 }
 
 /* Ratings + Search group (Align Left) */
@@ -108,7 +108,7 @@ th:nth-child(4), td:nth-child(4) {
 
 /* Adds space ONLY after the last Ratings button */
 .ratings-spacer {
-    width: 120px; /* Adjust to control space between Ratings and Search */
+    width: 160px; /* Adjust to control space between Ratings and Search */
     flex-shrink: 0; /* Prevents it from collapsing */
 }
 

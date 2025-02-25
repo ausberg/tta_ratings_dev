@@ -361,3 +361,21 @@ h2, p {
 .sf-icon {
     content: url('images/semi_finalist.png');
 }
+
+.player-link {
+    color: inherit; /* Matches the table text color */
+    text-decoration: none; /* Removes underline */
+    font-weight: bold; /* Optional: Make it bold */
+}
+
+.player-link:hover {
+    text-decoration: underline; /* Adds underline on hover */
+    color: #8B5A2B; /* Optional: Make it stand out a bit */
+}
+
+.yt-icon {
+    width: 14px;
+    height: 14px;
+    vertical-align: middle;
+    margin-left: 1px;
+}

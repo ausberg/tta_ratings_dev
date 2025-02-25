@@ -11,6 +11,17 @@ let autoRowsSet = false; // Track if Auto rows have been set already
 let manualRowsSet = false; // Track if the user manually selected rows
 let autoRowsInitialized = false; // Ensures Auto only runs once per page load
 
+const youtubeLinks = {
+    "Cogito3": "https://www.youtube.com/@cogitocontent5723",
+    "Sandwhale": "https://www.youtube.com/@sandwhaletta6550",
+    "Weidenbaum": "https://www.youtube.com/@weidenbaumtta2889",
+    "DJParson": "https://www.youtube.com/@DJParson",
+    "pajada": "https://www.youtube.com/@pajadacz",
+    "pv4": "https://www.youtube.com/@petervieren4881",
+    "dannyboy14": "https://www.youtube.com/@danny_boy_14",
+    "Martin_Pecheur": "https://www.youtube.com/@Martin_PecheurTTA"
+};
+
 function calculateRowsPerPage() {
     const tableContainer = document.querySelector(".table-container");
     if (!tableContainer) return 20; // Fallback in case element is missing
@@ -179,7 +190,15 @@ function formatPlayerName(player) {
         icon = '<img class="trophy qf-icon" src="images/quarter_finalist.png" alt="Quarter-Finalist" title="2024 World Quarter-Finalist - ' + player + '">';
     }
 
-    return `${icon} ${player}`;
+    // Check if the player has a YouTube link
+    let playerDisplay = player;
+    if (youtubeLinks[player]) {
+        playerDisplay = `<a href="${youtubeLinks[player]}" target="_blank" class="player-link">
+            ${player} <img src="images/youtube_icon.png" class="yt-icon" alt="YouTube">
+        </a>`;
+    }    
+
+    return `${icon} ${playerDisplay}`;
 }
 
 function addSorting() {

@@ -123,7 +123,7 @@ async function loadCSV(filename = "ratings_overall.csv", preservePage = false) {
 // Ensure the highlight formatting applies correctly
 function formatColumn(value, index) {
     // Columns where highlight formatting applies
-    const highlightColumns = [1, 2, 7, 9, 12, 14, 16, 19]; // Adjust as needed
+    const highlightColumns = [1, 7, 9, 12, 14, 16, 19]; // Adjust as needed
 
     let num = parseFloat(value);
 

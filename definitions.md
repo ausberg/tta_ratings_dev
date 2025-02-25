@@ -12,6 +12,9 @@ This document provides definitions for each column in the ratings table to help 
 ### **Rank Δ**
 - The change in a player's position on the leaderboard since the start of the rating period.
 
+### **LbRk**
+- The player's position on wolvs' TTA Leaderboard.
+
 ### **Title**
 - The highest division ever reached by a player in the International or Intermezzo tournament.
 - GM: Grandmaster

@@ -370,15 +370,25 @@ function applyAllFilters() {
             let operator = operatorMatch ? operatorMatch[0] : "=";
             let condition = filterValue.replace(/^(<=|>=|>|<|=|!=)\s*/, "").toLowerCase(); // Remove operator
     
-            // Special Handling: Player Name Filtering (Column Index 4)
+            // **Special Handling: Player Name Filtering (Column Index 4)**
             if (parseInt(colIndex) === 4) { 
                 let rawPlayerName = cellValue.replace(/<\/?[^>]+(>|$)/g, "").trim(); // Remove HTML tags
                 return rawPlayerName.toLowerCase().includes(condition); // Case-insensitive filtering
             }
     
-            // Existing logic for numeric/text filtering
+            // **Special Handling: Country Code Filtering (Flag Column)**
+            if (parseInt(colIndex) === 5) { // Ensure this matches the column for Country
+                let match = cellValue.match(/alt="([A-Z]+)"/);
+                let countryCode = match ? match[1] : "Unknown"; // Extract country code (e.g., "US", "DE")
+    
+                if (operator === "=") return countryCode === condition.toUpperCase();
+                if (operator === "!=") return countryCode !== condition.toUpperCase();
+                return false; // Ignore other operators for non-numeric values
+            }
+    
+            // **Existing Numeric/Text Filtering Logic**
             let numericValue = parseFloat(cellValue);
-            let numericCondition = parseFloat(filterValue.replace(/[^0-9.-]/g, ""));
+            let numericCondition = parseFloat(filterValue.replace(/[^0-9.-]/g, "")); // Extract numbers
     
             if (operator === "!=") {
                 if (!isNaN(numericValue) && !isNaN(numericCondition)) {
@@ -387,11 +397,11 @@ function applyAllFilters() {
                 return cellValue.toLowerCase() !== condition;
             }
     
-            if (isNaN(numericValue)) { // Text filtering
+            if (isNaN(numericValue)) { // Text-based filtering
                 return cellValue.toLowerCase().includes(condition);
             }
     
-            if (!isNaN(numericValue) && !isNaN(numericCondition)) { // Numeric filtering
+            if (!isNaN(numericValue) && !isNaN(numericCondition)) { // Numeric-based filtering
                 switch (operator) {
                     case "=": return numericValue === numericCondition;
                     case ">": return numericValue > numericCondition;
@@ -404,7 +414,7 @@ function applyAllFilters() {
     
             return false;
         });
-    });
+    });    
 
     displayPage(1);
 }

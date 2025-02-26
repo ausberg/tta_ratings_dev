@@ -375,7 +375,7 @@ function applyAllFilters() {
             let condition = filterValue.replace(/^(<=|>=|>|<|=|!=)\s*/, "").toLowerCase(); // Remove operator from input
 
             // Special Handling: Country Code Filtering
-            if (parseInt(colIndex) === 4) { // Column index for Country Code (CO)
+            if (parseInt(colIndex) === 5) { // Column index for Country Code (CO)
                 let match = cellValue.match(/alt="([A-Z]+)"/);
                 let countryCode = match ? match[1] : "Unknown"; // Extract "US", "DE", etc.
 

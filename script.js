@@ -364,44 +364,34 @@ function applyAllFilters() {
     filteredRows = allRows.filter(row => {
         return Object.entries(activeFilters).every(([colIndex, filterValue]) => {
             let cellValue = row[parseInt(colIndex)];
-
-            // Extract numeric value (if applicable)
-            let numericValue = parseFloat(cellValue);
-            let numericCondition = parseFloat(filterValue.replace(/[^0-9.-]/g, "")); // Extract numbers
-
-            // Extract operator (including `!=`)
+    
+            // Extract operator (if present)
             let operatorMatch = filterValue.match(/^(<=|>=|>|<|=|!=)/);
             let operator = operatorMatch ? operatorMatch[0] : "=";
-            let condition = filterValue.replace(/^(<=|>=|>|<|=|!=)\s*/, "").toLowerCase(); // Remove operator from input
-
-            // Special Handling: Country Code Filtering
-            if (parseInt(colIndex) === 5) { // Column index for Country Code (CO)
-                let match = cellValue.match(/alt="([A-Z]+)"/);
-                let countryCode = match ? match[1] : "Unknown"; // Extract "US", "DE", etc.
-
-                if (operator === "=") return countryCode === condition.toUpperCase();
-                if (operator === "!=") return countryCode !== condition.toUpperCase();
-                return false; // Ignore other operators for non-numeric values
+            let condition = filterValue.replace(/^(<=|>=|>|<|=|!=)\s*/, "").toLowerCase(); // Remove operator
+    
+            // Special Handling: Player Name Filtering (Column Index 4)
+            if (parseInt(colIndex) === 4) { 
+                let rawPlayerName = cellValue.replace(/<\/?[^>]+(>|$)/g, "").trim(); // Remove HTML tags
+                return rawPlayerName.toLowerCase().includes(condition); // Case-insensitive filtering
             }
-
-            // **Handle `!=` (not equal) for BOTH text and numeric values**
+    
+            // Existing logic for numeric/text filtering
+            let numericValue = parseFloat(cellValue);
+            let numericCondition = parseFloat(filterValue.replace(/[^0-9.-]/g, ""));
+    
             if (operator === "!=") {
                 if (!isNaN(numericValue) && !isNaN(numericCondition)) {
-                    return numericValue !== numericCondition; // Numeric comparison
+                    return numericValue !== numericCondition;
                 }
-                return cellValue.toLowerCase() !== condition; // String comparison
+                return cellValue.toLowerCase() !== condition;
             }
-
-            // **String-based Filtering**
-            if (isNaN(numericValue)) { // If not a number, treat as string
-                switch (operator) {
-                    case "=": return cellValue.toLowerCase() === condition;
-                    default: return cellValue.toLowerCase().includes(condition); // Default substring match
-                }
+    
+            if (isNaN(numericValue)) { // Text filtering
+                return cellValue.toLowerCase().includes(condition);
             }
-
-            // **Numeric-based Filtering**
-            if (!isNaN(numericValue) && !isNaN(numericCondition)) {
+    
+            if (!isNaN(numericValue) && !isNaN(numericCondition)) { // Numeric filtering
                 switch (operator) {
                     case "=": return numericValue === numericCondition;
                     case ">": return numericValue > numericCondition;
@@ -411,7 +401,7 @@ function applyAllFilters() {
                     default: return false;
                 }
             }
-
+    
             return false;
         });
     });

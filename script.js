@@ -19,7 +19,12 @@ const youtubeLinks = {
     "pajada": "https://www.youtube.com/@pajadacz",
     "pv4": "https://www.youtube.com/@petervieren4881",
     "dannyboy14": "https://www.youtube.com/@danny_boy_14",
-    "Martin_Pecheur": "https://www.youtube.com/@Martin_PecheurTTA"
+    "Martin_Pecheur": "https://www.youtube.com/@Martin_PecheurTTA",
+    "Eepogi": "https://www.youtube.com/@eepogi",
+    "Boristina": "https://www.youtube.com/@papaboris8665",
+    "Sugoi": "https://www.youtube.com/@sugoitta8323",
+    "DANeo": "https://www.youtube.com/@daneo1952",
+    "Japhet": "https://www.youtube.com/@jaafit"
 };
 
 function calculateRowsPerPage() {

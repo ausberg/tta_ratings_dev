@@ -9,6 +9,7 @@ The following tournaments have been fully completed since the beginning of the c
 - **Mercurial Ladder** Season 20
 - **Mercurial Ladder** Season 21
 - **Royal League** Season 2 Tiebreakers
+- **Royal League** Season 3
 - **Slow Burn** Season 6
 - **Sodium Ladder** Season 2
 - **Transcontinental Ladder** Round 119

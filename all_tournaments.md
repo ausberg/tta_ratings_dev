@@ -11,7 +11,7 @@ This document lists all the tournaments included in the ratings system.
 - **Mercurial Ladder** up to Round 21
 - **Nations League** from Season 2 up to Season 10
 - **Premier League** up to Season 4
-- **Royal League** up to Season 2
+- **Royal League** up to Season 3
 - **Slow Burn** up to Season 6
 - **Sodium Ladder** up to Season 2
 - **Transcontinental Ladder** up to Round 121

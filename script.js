@@ -24,7 +24,8 @@ const youtubeLinks = {
     "Boristina": "https://www.youtube.com/@papaboris8665",
     "Sugoi": "https://www.youtube.com/@sugoitta8323",
     "DANeo": "https://www.youtube.com/@daneo1952",
-    "Japhet": "https://www.youtube.com/@jaafit"
+    "Japhet": "https://www.youtube.com/@jaafit",
+    "Olesch": "https://www.youtube.com/@OleschY"
 };
 
 function calculateRowsPerPage() {

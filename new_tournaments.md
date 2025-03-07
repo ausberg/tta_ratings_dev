@@ -12,6 +12,7 @@ The following tournaments have been fully completed since the beginning of the c
 - **Royal League** Season 3
 - **Slow Burn** Season 6
 - **Sodium Ladder** Season 2
+- **Sodium Ladder** Season 3
 - **Transcontinental Ladder** Round 119
 - **Transcontinental Ladder** Round 120
 - **Transcontinental Ladder** Round 121

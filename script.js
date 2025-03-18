@@ -25,7 +25,7 @@ const youtubeLinks = {
     "Sugoi": "https://www.youtube.com/@sugoitta8323",
     "DANeo": "https://www.youtube.com/@daneo1952",
     "Japhet": "https://www.youtube.com/@jaafit",
-    "Olesch": "https://www.youtube.com/@OleschY"
+    "Olesch": "https://www.youtube.com/watch?v=2QWsA4vfA9w"
 };
 
 function calculateRowsPerPage() {

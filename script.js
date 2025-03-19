@@ -75,7 +75,8 @@ async function loadCSV(filename = "ratings_overall.csv", preservePage = false) {
             return [
                 columns[0],  // Rank
                 columns[1],  // Rank Δ
-                columns[22], // Leaderboard Rank
+                columns[23], // Leaderboard Rank
+                columns[22], // Title Count
                 columns[21], // Title
                 formatPlayerName(columns[2]),  // Player name with trophy
                 flagImg,  // Country (Flag icon with proper fallback)
@@ -94,14 +95,14 @@ async function loadCSV(filename = "ratings_overall.csv", preservePage = false) {
                 parseFloat(columns[18]).toFixed(1),  // W%
                 parseFloat(columns[19]).toFixed(2)   // W% Δ
             ];
-        }).filter(columns => columns.length === 20);                     
+        }).filter(columns => columns.length === 21);                     
     
         allRows = rawRows; // Store processed rows
     
         // Now that allRows is built, store raw player names separately
         playerRawNames = {}; // Reset to prevent duplicates
         allRows.forEach((row, index) => {
-            let rawPlayerName = row[4].replace(/<[^>]+>/g, "").trim(); // Remove HTML tags from formatted name
+            let rawPlayerName = row[5].replace(/<[^>]+>/g, "").trim(); // Remove HTML tags from formatted name
             playerRawNames[rawPlayerName.toLowerCase()] = index;
         });
     
@@ -129,12 +130,12 @@ async function loadCSV(filename = "ratings_overall.csv", preservePage = false) {
 // Ensure the highlight formatting applies correctly
 function formatColumn(value, index) {
     // Columns where highlight formatting applies
-    const highlightColumns = [1, 7, 9, 12, 14, 16, 19]; // Adjust as needed
+    const highlightColumns = [1, 8, 10, 13, 15, 17, 20]; // Adjust as needed
 
     let num = parseFloat(value);
 
-    // Special case: Column 16 should be red **only if the value is greater than 0**
-    if (index === 16 && !isNaN(num) && num > 0) {
+    // Special case: Column 17 should be red **only if the value is greater than 0**
+    if (index === 17 && !isNaN(num) && num > 0) {
         return `<td class="red">+${num}</td>`;
     }
 
@@ -232,7 +233,7 @@ function addSorting() {
                 let valA = a[index], valB = b[index];
             
                 // Special case: Sorting "Player" column (index 4)
-                if (index === 4) {
+                if (index === 5) {
                     // Strip HTML tags to get the actual player name
                     let cleanA = valA.replace(/<\/?[^>]+(>|$)/g, "").trim();
                     let cleanB = valB.replace(/<\/?[^>]+(>|$)/g, "").trim();
@@ -377,13 +378,13 @@ function applyAllFilters() {
             let condition = filterValue.replace(/^(<=|>=|>|<|=|!=)\s*/, "").toLowerCase(); // Remove operator
     
             // **Special Handling: Player Name Filtering (Column Index 4)**
-            if (parseInt(colIndex) === 4) { 
+            if (parseInt(colIndex) === 5) { 
                 let rawPlayerName = cellValue.replace(/<\/?[^>]+(>|$)/g, "").trim(); // Remove HTML tags
                 return rawPlayerName.toLowerCase().includes(condition); // Case-insensitive filtering
             }
     
             // **Special Handling: Country Code Filtering (Flag Column)**
-            if (parseInt(colIndex) === 5) { // Ensure this matches the column for Country
+            if (parseInt(colIndex) === 6) { // Ensure this matches the column for Country
                 let match = cellValue.match(/alt="([A-Z]+)"/);
                 let countryCode = match ? match[1] : "Unknown"; // Extract country code (e.g., "US", "DE")
     
@@ -739,9 +740,9 @@ function searchTable() {
     let searchNames = searchQuery.split(",").map(name => name.trim().toLowerCase());
 
     filteredRows = allRows.filter(row => {
-        if (typeof row[4] !== "string") return false;
+        if (typeof row[5] !== "string") return false;
 
-        let playerName = row[4].replace(/<\/?[^>]+(>|$)/g, "").trim().toLowerCase(); // Strip HTML before search
+        let playerName = row[5].replace(/<\/?[^>]+(>|$)/g, "").trim().toLowerCase(); // Strip HTML before search
 
         return searchNames.some(name => {
             if ((name.startsWith('"') && name.endsWith('"')) || (name.startsWith("'") && name.endsWith("'"))) {
@@ -764,7 +765,7 @@ function applySearchFilter() {
 
     // Ensure search is applied AFTER column filters
     filteredRows = (filteredRows.length > 0 ? filteredRows : allRows).filter(row =>
-        typeof row[4] === "string" && searchNames.some(name => row[4].toLowerCase().includes(name))
+        typeof row[5] === "string" && searchNames.some(name => row[5].toLowerCase().includes(name))
     );
 
     displayPage(1); // Refresh the table with filtered results

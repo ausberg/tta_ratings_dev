@@ -75,9 +75,9 @@ async function loadCSV(filename = "ratings_overall.csv", preservePage = false) {
             return [
                 columns[0],  // Rank
                 columns[1],  // Rank Δ
-                columns[23], // Leaderboard Rank
-                columns[22], // Title Count
-                columns[21], // Title
+                columns[21], // Leaderboard Rank
+                columns[22], // Title
+                columns[23], // Title Count
                 formatPlayerName(columns[2]),  // Player name with trophy
                 flagImg,  // Country (Flag icon with proper fallback)
                 parseFloat(columns[4]).toFixed(0),  // C Rating
@@ -232,7 +232,7 @@ function addSorting() {
             dataToSort.sort((a, b) => {
                 let valA = a[index], valB = b[index];
             
-                // Special case: Sorting "Player" column (index 4)
+                // Special case: Sorting "Player" column (index 5)
                 if (index === 5) {
                     // Strip HTML tags to get the actual player name
                     let cleanA = valA.replace(/<\/?[^>]+(>|$)/g, "").trim();

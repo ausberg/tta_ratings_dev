@@ -75,8 +75,8 @@ async function loadCSV(filename = "ratings_overall.csv", preservePage = false) {
             return [
                 columns[0],  // Rank
                 columns[1],  // Rank Δ
-                columns[21], // Leaderboard Rank
-                columns[22], // Title
+                columns[23], // Leaderboard Rank
+                columns[21], // Title
                 formatPlayerName(columns[2]),  // Player name with trophy
                 flagImg,  // Country (Flag icon with proper fallback)
                 parseFloat(columns[4]).toFixed(0),  // C Rating

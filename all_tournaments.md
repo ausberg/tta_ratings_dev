@@ -8,7 +8,7 @@ This document lists all the tournaments included in the ratings system.
 - **Eiffel Tower** up to Season 2
 - **Intermezzo Championship** up to Season 25
 - **International Championship** up to Season 28
-- **Mercurial Ladder** up to Round 21
+- **Mercurial Ladder** up to Round 22
 - **Nations League** from Season 2 up to Season 10
 - **Premier League** up to Season 4
 - **Royal League** up to Season 3
@@ -19,7 +19,7 @@ This document lists all the tournaments included in the ratings system.
 - **World Championship 2022**
 - **World Championship 2023**
 - **World Championship 2024**
-- **World Championship 2025** up to Stage 2
+- **World Championship 2025** up to Stage 3
 
 ---
 

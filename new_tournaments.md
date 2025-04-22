@@ -5,6 +5,7 @@ The following tournaments have been fully completed since the beginning of the c
 ## Newly completed Tournaments
 
 - **Mercurial Ladder** Season 22
+- **Sodium Ladder** Season 4
 - **World Championship** 2025 Stage 3
 
 ---

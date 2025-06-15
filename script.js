@@ -13,7 +13,7 @@ let autoRowsInitialized = false; // Ensures Auto only runs once per page load
 
 const youtubeLinks = {
     "Cogito3": "https://www.youtube.com/@cogitocontent5723",
-    "Sandwhale": "https://www.youtube.com/@sandwhaletta6550",
+    "Sandwhale": "https://www.youtube.com/@sandwhaletta",
     "Weidenbaum": "https://www.youtube.com/@weidenbaumtta2889",
     "DJParson": "https://www.youtube.com/@DJParson",
     "pajada": "https://www.youtube.com/@pajadacz",

@@ -6,6 +6,7 @@ The following tournaments have been fully completed since the beginning of the c
 
 - **French Open 2025** (odd games)
 - **Mercurial Ladder** Season 25
+- **Sodium Ladder** Season 6
 - **Transcontinental Ladder** Round 126 (CGE 72)
 - **World Championship** 2025 Stage 5
 

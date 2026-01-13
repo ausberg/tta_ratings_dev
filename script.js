@@ -171,36 +171,40 @@ async function fetchLastCommitDate() {
 }
 fetchLastCommitDate();
 
-function formatPlayerName(player) {
-    let icon = '';
+function formatPlayerName(playerRaw) {
+  const player = (playerRaw ?? "").toString().trim().toLowerCase();
+  let icon = "";
 
-    if (player === "a440") {
-        icon = '<img class="trophy gold-trophy" src="images/gold_trophy.png" alt="Gold Trophy" title="2025 World Champion - a440">';
-    } else if (player === "kyshantry") {
-        icon = '<img class="trophy silver-trophy" src="images/silver_trophy.png" alt="Silver Trophy" title="2025 World Runner-Up - kyshantry">';
-    } else if (player === "placeholder1") {
-        icon = '<img class="trophy bronze-trophy" src="images/bronze_trophy.png" alt="Bronze Trophy" title="2025 World 3rd Place - placeholder2">';
-    } else if (player === "placeholder2") {
-        icon = '<img class="trophy fourth-place-ribbon" src="images/fourth_place.png" alt="4th Place Ribbon" title="2025 World 4th Place - placeholder2">';
-    } else if ([
-        "placeholder1", "placeholder2", "placeholder3"
-    ].includes(player)) {
-        icon = '<img class="trophy sf-icon" src="images/semi_finalist.png" alt="Semi-Finalist" title="2025 World Semi-Finalist - ' + player + '">';
-    } else if ([
-        "placeholder1", "placeholder2", "placeholder3"
-    ].includes(player)) {
-        icon = '<img class="trophy qf-icon" src="images/quarter_finalist.png" alt="Quarter-Finalist" title="2025 World Quarter-Finalist - ' + player + '">';
+  if (player === "a440") {
+    icon = '<img class="trophy gold-trophy" src="images/gold_trophy.png" alt="Gold Trophy" title="2025 World Champion - a440">';
+  } else if (player === "kyshantry") {
+    icon = '<img class="trophy silver-trophy" src="images/silver_trophy.png" alt="Silver Trophy" title="2025 World Runner-Up - kyshantry">';
+  } else if (player === "placeholder1") {
+    icon = '<img class="trophy bronze-trophy" src="images/bronze_trophy.png" alt="Bronze Trophy" title="2025 World 3rd Place - placeholder1">';
+  } else if (player === "placeholder2") {
+    icon = '<img class="trophy fourth-place-ribbon" src="images/fourth_place.png" alt="4th Place Ribbon" title="2025 World 4th Place - placeholder2">';
+  } else {
+    const semiFinalists = new Set(["placeholder3"]);      // put real names here later
+    const quarterFinalists = new Set([]);                 // or fill this
+
+    if (semiFinalists.has(player)) {
+      icon = `<img class="trophy sf-icon" src="images/semi_finalist.png" alt="Semi-Finalist" title="2025 World Semi-Finalist - ${player}">`;
+    } else if (quarterFinalists.has(player)) {
+      icon = `<img class="trophy qf-icon" src="images/quarter_finalist.png" alt="Quarter-Finalist" title="2025 World Quarter-Finalist - ${player}">`;
     }
+  }
 
-    // Check if the player has a YouTube link
-    let playerDisplay = player;
-    if (youtubeLinks[player]) {
-        playerDisplay = `<a href="${youtubeLinks[player]}" target="_blank" class="player-link">
-            ${player} <img src="images/youtube_icon.png" class="yt-icon" alt="YouTube">
-        </a>`;
-    }    
+  // Keep original casing for display, but normalize for lookup
+  let playerDisplay = (playerRaw ?? "").toString().trim();
+  const yt = youtubeLinks?.[player] || youtubeLinks?.[playerDisplay]; // supports either key style
 
-    return `${icon} ${playerDisplay}`;
+  if (yt) {
+    playerDisplay = `<a href="${yt}" target="_blank" class="player-link">
+      ${playerDisplay} <img src="images/youtube_icon.png" class="yt-icon" alt="YouTube">
+    </a>`;
+  }
+
+  return `${icon} ${playerDisplay}`.trim();
 }
 
 function addSorting() {

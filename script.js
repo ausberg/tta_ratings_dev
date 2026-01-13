@@ -174,27 +174,22 @@ fetchLastCommitDate();
 function formatPlayerName(player) {
     let icon = '';
 
-    if (player === "Martin_Pecheur") {
-        icon = '<img class="trophy gold-trophy" src="images/gold_trophy.png" alt="Gold Trophy" title="2024 World Champion - Martin_Pecheur">';
-    } else if (player === "pv4") {
-        icon = '<img class="trophy silver-trophy" src="images/silver_trophy.png" alt="Silver Trophy" title="2024 World Runner-Up - pv4">';
-    } else if (player === "Weidenbaum") {
-        icon = '<img class="trophy bronze-trophy" src="images/bronze_trophy.png" alt="Bronze Trophy" title="2024 World 3rd Place - Weidenbaum">';
-    } else if (player === "e5582768") {
-        icon = '<img class="trophy fourth-place-ribbon" src="images/fourth_place.png" alt="4th Place Ribbon" title="2024 World 4th Place - e5582768">';
+    if (player === "a440") {
+        icon = '<img class="trophy gold-trophy" src="images/gold_trophy.png" alt="Gold Trophy" title="2025 World Champion - a440">';
+    } else if (player === "kyshantry") {
+        icon = '<img class="trophy silver-trophy" src="images/silver_trophy.png" alt="Silver Trophy" title="2025 World Runner-Up - kyshantry">';
+    } else if (player === "placeholder1") {
+        icon = '<img class="trophy bronze-trophy" src="images/bronze_trophy.png" alt="Bronze Trophy" title="2025 World 3rd Place - placeholder2">';
+    } else if (player === "placeholder2") {
+        icon = '<img class="trophy fourth-place-ribbon" src="images/fourth_place.png" alt="4th Place Ribbon" title="2025 World 4th Place - placeholder2">';
     } else if ([
-        "Lcfyx", "Wawrzyniec", "St4nkk", "Pascalotopia", "mbbchess", "RutgerHauer", 
-        "Genghisip", "Gilgamesh2", "Vantablack"
+        "placeholder1", "placeholder2", "placeholder3"
     ].includes(player)) {
-        icon = '<img class="trophy sf-icon" src="images/semi_finalist.png" alt="Semi-Finalist" title="2024 World Semi-Finalist - ' + player + '">';
+        icon = '<img class="trophy sf-icon" src="images/semi_finalist.png" alt="Semi-Finalist" title="2025 World Semi-Finalist - ' + player + '">';
     } else if ([
-        "Tordread", "totsilence", "Flackk", "321letsjam", "DJParson", "DJLAODIE", 
-        "Dantes", "bobaboba", "a440", "Majondor", "Fourierrr", "CaesarSalah", "Lech", 
-        "SnailZane", "FirstOfDao", "Sylvain", "treitze", "Berfner", "Eepogi", 
-        "barboucha", "Brightfuture", "Gutemetralla", "Grozz", "Musan", "Fjantarik", 
-        "Hsugneslie", "Snucka"
+        "placeholder1", "placeholder2", "placeholder3"
     ].includes(player)) {
-        icon = '<img class="trophy qf-icon" src="images/quarter_finalist.png" alt="Quarter-Finalist" title="2024 World Quarter-Finalist - ' + player + '">';
+        icon = '<img class="trophy qf-icon" src="images/quarter_finalist.png" alt="Quarter-Finalist" title="2025 World Quarter-Finalist - ' + player + '">';
     }
 
     // Check if the player has a YouTube link

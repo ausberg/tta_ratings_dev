@@ -4,9 +4,21 @@ The following tournaments have been fully completed since the beginning of the c
 
 ## Newly completed Tournaments
 
+- **French Open 2025** Stage 4 (even games)
+- **French Open 2025** Stage 4 (odd games)
+- **International Championship** Season 32 (CGE 23)
 - **Mercurial Ladder** Season 30
+- **Mercurial Ladder** Season 31
+- **Royal League** Season 7
+- **Slow Burn** Season 12
 - **Sodium Ladder** Season 10
+- **Sodium Ladder** Season 11
 - **Transcontinental Ladder** Round 131 (CGE 77)
+- **Transcontinental Ladder** Round 132 (CGE 78)
+- **Transcontinental Ladder** Round 133 (CGE 79)
+- **Transcontinental Ladder** Round 134 (CGE 80)
+- **World Championship 2026** Stage 1
+- **World Championship 2026** Stage 2
 
 ---
 

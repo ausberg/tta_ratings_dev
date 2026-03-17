@@ -6,13 +6,19 @@ The following tournaments have been fully completed since the beginning of the c
 
 - **French Open 2025** Stage 4 (even games)
 - **French Open 2025** Stage 4 (odd games)
+- **Intermezzo Championship** Season 29 (CGE 24)
 - **International Championship** Season 32 (CGE 23)
+- **Leaderboard Trophy 2025** Stage 1
+- **Leaderboard Trophy 2025** Stage 2
+- **Leaderboard Trophy 2025** Stage 3
 - **Mercurial Ladder** Season 30
 - **Mercurial Ladder** Season 31
 - **Royal League** Season 7
 - **Slow Burn** Season 12
 - **Sodium Ladder** Season 10
 - **Sodium Ladder** Season 11
+- **Survivors Cup 2026** Stage 1
+- **Survivors Cup 2026** Stage 2
 - **Transcontinental Ladder** Round 131 (CGE 77)
 - **Transcontinental Ladder** Round 132 (CGE 78)
 - **Transcontinental Ladder** Round 133 (CGE 79)

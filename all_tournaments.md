@@ -6,25 +6,25 @@ This document lists all the tournaments included in the ratings system.
 
 - **Duel Curve** from Season 2 up to Season 11
 - **Eiffel Tower** up to Season 3
-- **French Open 2025** up to Stage 4
-- **Intermezzo Championship** up to Season 29 (CGE 24)
-- **International Championship** up to Season 32 (CGE 23)
+- **French Open 2025**
+- **Intermezzo Championship** up to Season 30 (CGE 25)
+- **International Championship** up to Season 33 (CGE 24)
 - **Leaderboard Trophy 2025**
-- **Mercurial Ladder** up to Round 31
+- **Mercurial Ladder** up to Round 34
 - **Nations League** from Season 2 up to Season 10
 - **Premier League** up to Season 4
-- **Royal League** up to Season 7
-- **Slow Burn** up to Season 12
-- **Sodium Ladder** up to Season 11
-- **Survivors Cup 2026** up to Stage 2
-- **Transcontinental Ladder** up to Round 134 (CGE 80)
+- **Royal League** up to Season 8
+- **Slow Burn** up to Season 14
+- **Sodium Ladder** up to Season 13
+- **Survivors Cup 2026** up to Stage 6
+- **Transcontinental Ladder** up to Round 137 (CGE 83)
 - **Wimbledon 2023**
 - **Wimbledon 2025**
 - **World Championship 2022**
 - **World Championship 2023**
 - **World Championship 2024**
 - **World Championship 2025**
-- **World Championship 2026** up to Stage 2
+- **World Championship 2026** up to Stage 4
 
 ---
 

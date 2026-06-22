@@ -4,27 +4,27 @@ The following tournaments have been fully completed since the beginning of the c
 
 ## Newly completed Tournaments
 
-- **French Open 2025** Stage 4 (even games)
-- **French Open 2025** Stage 4 (odd games)
-- **Intermezzo Championship** Season 29 (CGE 24)
-- **International Championship** Season 32 (CGE 23)
-- **Leaderboard Trophy 2025** Stage 1
-- **Leaderboard Trophy 2025** Stage 2
-- **Leaderboard Trophy 2025** Stage 3
-- **Mercurial Ladder** Season 30
-- **Mercurial Ladder** Season 31
-- **Royal League** Season 7
-- **Slow Burn** Season 12
-- **Sodium Ladder** Season 10
-- **Sodium Ladder** Season 11
-- **Survivors Cup 2026** Stage 1
-- **Survivors Cup 2026** Stage 2
-- **Transcontinental Ladder** Round 131 (CGE 77)
-- **Transcontinental Ladder** Round 132 (CGE 78)
-- **Transcontinental Ladder** Round 133 (CGE 79)
-- **Transcontinental Ladder** Round 134 (CGE 80)
-- **World Championship 2026** Stage 1
-- **World Championship 2026** Stage 2
+- **French Open 2025** Stage 5 (even games)
+- **French Open 2025** Stage 6 (odd games)
+- **Intermezzo Championship** Season 30 (CGE 25)
+- **International Championship** Season 33 (CGE 24)
+- **Mercurial Ladder** Season 32
+- **Mercurial Ladder** Season 33
+- **Mercurial Ladder** Season 34
+- **Royal League** Season 8
+- **Slow Burn** Season 13
+- **Slow Burn** Season 14
+- **Sodium Ladder** Season 12
+- **Sodium Ladder** Season 13
+- **Survivors Cup 2026** Stage 3
+- **Survivors Cup 2026** Stage 4
+- **Survivors Cup 2026** Stage 5
+- **Survivors Cup 2026** Stage 6
+- **Transcontinental Ladder** Round 135 (CGE 81)
+- **Transcontinental Ladder** Round 136 (CGE 82)
+- **Transcontinental Ladder** Round 137 (CGE 83)
+- **World Championship 2026** Stage 3
+- **World Championship 2026** Stage 4
 
 ---
 
